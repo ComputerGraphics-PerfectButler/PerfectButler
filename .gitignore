@@ -97,3 +97,12 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+
+# External Assets
+/[Aa]ssets/98-3d-cats-tree/
+/[Aa]ssets/Fries and Seagull/
+/[Aa]ssets/Furniture Mega Pack/
+/[Aa]ssets/Hyper Casual Characters/
+/[Aa]ssets/ithappy/
+/[Aa]ssets/Palmov Island/
