@@ -8,8 +8,8 @@ PerfectButler/
     ├── _Project/                # 메인 프로젝트 폴더
     │   ├── Scenes/              # Unity 씬 파일
     │   │   ├── Main/           # 메인 게임 씬
-    │   │   │   ├── Home.unity     # 집 씬
-    │   │   │   ├── Park.unity     # 공원 씬
+    │   │   │   ├── room.unity     # 집 씬
+    │   │   │   ├── park1.unity     # 공원 씬
     │   │   │   └── MainMenu.unity # 메인 메뉴
     │   │   └── Test/           # 테스트 씬
     │   │       ├── CatMovement.unity       # 고양이 모션 테스트
@@ -21,7 +21,7 @@ PerfectButler/
     │   │   │   ├── CatStats.cs       # 고양이 스탯 시스템
     │   │   │   ├── StatType.cs       # 스탯 타입 정의
     │   │   │   └── LevelData.cs      # 레벨 데이터
-    │   │   ├── C# Script/      # 캐릭터 컨트롤러
+    │   │   ├── Controller/      # 캐릭터 컨트롤러
     │   │   │   ├── PlayerMovement.cs # 플레이어 이동 컨트롤러
     │   │   │   ├── CatController.cs  # 고양이 컨트롤러
     │   │   │   └── FollowCamera.cs   # 카메라 팔로우
@@ -45,7 +45,6 @@ PerfectButler/
     ├── Hyper Casual Characters/ # 외부 에셋: 캐릭터
     ├── ithappy/                 # 외부 에셋
     ├── Palmov Island/           # 외부 에셋: 섬 배경
-    ├── scenes/                  # 외부 씬 에셋
     ├── Settings/                # Unity 설정
     └── Textures/                # 공용 텍스처
 ```
@@ -68,7 +67,7 @@ PerfectButler/
 
 ### 진행 중인 작업
 - [ ] 플레이어 컨트롤러 고도화
-- [ ] 고양이 AI 시스템
+- [ ] 고양이 상호작용
 - [ ] 미니게임 시스템
 - [ ] 오디오 시스템
 
