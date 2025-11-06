@@ -12,6 +12,8 @@ PerfectButler/
     │   │   │   ├── Park.unity     # 공원 씬
     │   │   │   └── MainMenu.unity # 메인 메뉴
     │   │   └── Test/           # 테스트 씬
+    │   │       ├── CatMovement.unity       # 고양이 모션 테스트
+    │   │       └── CharacterMovement.unity # 캐릭터 모션 테스트
     │   │
     │   ├── Scripts/             # C# 스크립트
     │   │   ├── GameSystem/     # 게임 시스템
@@ -19,6 +21,10 @@ PerfectButler/
     │   │   │   ├── CatStats.cs       # 고양이 스탯 시스템
     │   │   │   ├── StatType.cs       # 스탯 타입 정의
     │   │   │   └── LevelData.cs      # 레벨 데이터
+    │   │   ├── C# Script/      # 캐릭터 컨트롤러
+    │   │   │   ├── PlayerMovement.cs # 플레이어 이동 컨트롤러
+    │   │   │   ├── CatController.cs  # 고양이 컨트롤러
+    │   │   │   └── FollowCamera.cs   # 카메라 팔로우
     │   │   ├── UI/             # UI 관련
     │   │   │   └── MainGameUI.cs     # 메인 게임 UI
     │   │   ├── Player/         # 플레이어 관련
@@ -32,10 +38,16 @@ PerfectButler/
     │   └── Audio/              # 오디오 파일
     │
     ├── 98-3d-cats-tree/        # 외부 에셋: 고양이 트리
+    ├── Art/                     # 외부 에셋: 아트 리소스
     ├── Cats/                    # 외부 에셋: 고양이 모델
+    ├── Fries and Seagull/       # 외부 에셋: 프라이스와 갈매기
     ├── Furniture Mega Pack/     # 외부 에셋: 가구
     ├── Hyper Casual Characters/ # 외부 에셋: 캐릭터
-    └── Palmov Island/           # 외부 에셋: 섬 배경
+    ├── ithappy/                 # 외부 에셋
+    ├── Palmov Island/           # 외부 에셋: 섬 배경
+    ├── scenes/                  # 외부 씬 에셋
+    ├── Settings/                # Unity 설정
+    └── Textures/                # 공용 텍스처
 ```
 
 ## 개발 현황
@@ -47,13 +59,15 @@ PerfectButler/
   - [x] MainMenu 씬 (메인 메뉴)
   - [x] Home 씬 (집 맵)
   - [x] Park 씬 (공원 맵)
+  - [x] Test 씬 (CatMovement, CharacterMovement)
 - [x] 캐릭터 모션 시스템
-  - [x] Stickman 캐릭터 모션
-  - [x] 고양이 모션
+  - [x] Stickman 캐릭터 모션 (PlayerMovement.cs)
+  - [x] 고양이 모션 (CatController.cs)
+  - [x] 카메라 팔로우 시스템 (FollowCamera.cs)
 - [x] 메인 게임 UI 기본 구조
 
 ### 진행 중인 작업
-- [ ] 플레이어 컨트롤러 구현
+- [ ] 플레이어 컨트롤러 고도화
 - [ ] 고양이 AI 시스템
 - [ ] 미니게임 시스템
 - [ ] 오디오 시스템
