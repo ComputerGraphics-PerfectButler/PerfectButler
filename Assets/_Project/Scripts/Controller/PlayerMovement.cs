@@ -1,15 +1,14 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // 👈 새 입력 시스템 네임스페이스 추가
+using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    public float rotationSpeed = 10f;
 
     private CharacterController controller;
     private Animator animator;
-
-    private Vector2 moveInput;
-    private KeyCode lastKey = KeyCode.None;
 
     void Start()
     {
@@ -19,32 +18,32 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // 🔄 Input System의 Keyboard 클래스 사용
+        var keyboard = Keyboard.current;
+
         float h = 0f;
         float v = 0f;
 
-        var keyboard = Keyboard.current;
+        bool up = keyboard.wKey.isPressed;
+        bool down = keyboard.sKey.isPressed;
+        bool left = keyboard.aKey.isPressed;
+        bool right = keyboard.dKey.isPressed;
 
-        if (keyboard.wKey.isPressed) { v -= 1; lastKey = KeyCode.W; }
-        if (keyboard.sKey.isPressed) { v += 1; lastKey = KeyCode.S; }
-        if (keyboard.aKey.isPressed) { h += 1; lastKey = KeyCode.A; }
-        if (keyboard.dKey.isPressed) { h -= 1; lastKey = KeyCode.D; }
+        if (up && down) v = 0f;
+        else if (up) v += 1f;
+        else if (down) v -= 1f;
+
+        if (left && right) h = 0f;
+        else if (right) h += 1f;
+        else if (left) h -= 1f;
 
         Vector3 moveDir = new Vector3(h, 0, v).normalized;
 
         if (moveDir != Vector3.zero)
         {
-            float targetY = transform.localEulerAngles.y;
+            // ✅ 방향 반전 (-moveDir)
+            Quaternion targetRotation = Quaternion.LookRotation(-moveDir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
-            switch (lastKey)
-            {
-                case KeyCode.W: targetY = 180f; break;
-                case KeyCode.S: targetY = 0f; break;
-                case KeyCode.A: targetY = 90f; break;
-                case KeyCode.D: targetY = -90f; break;
-            }
-
-            transform.localEulerAngles = new Vector3(0, targetY, 0);
             controller.Move(moveDir * moveSpeed * Time.deltaTime);
             animator?.SetBool("isWalking", true);
         }

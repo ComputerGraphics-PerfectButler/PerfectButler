@@ -11,7 +11,7 @@ public class CatController_NewInput : MonoBehaviour
 
     [Header("Flip Settings")]
     public float flipHeight = 2.5f;           // 점프 높이 (Q/E용)
-    public float flipRotateSpeed = 360f;      // 초당 회전 속도 (느리게 한 바퀴)
+    public float flipRotateSpeed = 360f;      // 초당 회전 속도
     public float flipDuration = 1.0f;         // 전체 동작 시간
 
     [Header("Sound")]
@@ -23,10 +23,12 @@ public class CatController_NewInput : MonoBehaviour
     private bool isJumping = false;
     private float flipTimer = 0f;
     private Vector3 flipDir = Vector3.zero;
+    private Quaternion flipBaseRotation;      // ← 덤블링 기준 회전
 
     // 감정표현 관련
     private float emotionTimer = 0f;
     private string currentEmotion = "";
+    private Quaternion baseRotation;          // ← 감정표현 기준 회전
 
     void Start()
     {
@@ -100,43 +102,55 @@ public class CatController_NewInput : MonoBehaviour
         // ===========================
         // 4️⃣ 감정표현 (J/K/L)
         // ===========================
-        // 누르고 있는 동안 반복, 떼면 마지막 왕복 후 복귀
-        if (kb.jKey.isPressed) currentEmotion = "shakeY";
-        else if (kb.kKey.isPressed) currentEmotion = "nodX";
-        else if (kb.lKey.isPressed && !moving) currentEmotion = "rollZ";
+        if (kb.jKey.wasPressedThisFrame)
+        {
+            currentEmotion = "shakeY";
+            baseRotation = transform.rotation;
+        }
+        else if (kb.kKey.wasPressedThisFrame)
+        {
+            currentEmotion = "nodX";
+            baseRotation = transform.rotation;
+        }
+        else if (kb.lKey.wasPressedThisFrame && !moving)
+        {
+            currentEmotion = "rollZ";
+            baseRotation = transform.rotation;
+        }
 
-        // 키를 떼면 마지막으로 한 번 왕복
+        // 키를 뗐을 때 타이머 초기화
         if (kb.jKey.wasReleasedThisFrame || kb.kKey.wasReleasedThisFrame || kb.lKey.wasReleasedThisFrame)
         {
             emotionTimer = 0f;
         }
     }
 
-    // 🎭 감정표현 (누르고 있으면 반복, 떼면 마지막 왕복 후 복귀)
+    // 🎭 감정표현 (현재 회전 기준으로 상대 회전 적용)
     void HandleEmotion()
     {
         if (string.IsNullOrEmpty(currentEmotion)) return;
 
-        // 천천히 (이전처럼 Time.time * 10f 수준)
         emotionTimer += Time.deltaTime * 10f;
-
         float sin = Mathf.Sin(emotionTimer);
         float angle = sin * 25f;
 
-        if (currentEmotion == "shakeY")
-            transform.localRotation = Quaternion.Euler(0, angle, 0);
-        else if (currentEmotion == "nodX")
-            transform.localRotation = Quaternion.Euler(angle, 0, 0);
-        else if (currentEmotion == "rollZ")
-            transform.localRotation = Quaternion.Euler(0, 0, angle);
+        Quaternion relativeRotation = Quaternion.identity;
 
-        // 키를 뗀 경우: 마지막 왕복 후 서서히 복귀
+        if (currentEmotion == "shakeY")
+            relativeRotation = Quaternion.Euler(0, angle, 0);
+        else if (currentEmotion == "nodX")
+            relativeRotation = Quaternion.Euler(angle, 0, 0);
+        else if (currentEmotion == "rollZ")
+            relativeRotation = Quaternion.Euler(0, 0, angle);
+
+        transform.rotation = baseRotation * relativeRotation;
+
         var kb = Keyboard.current;
         bool keyUp = (!kb.jKey.isPressed && !kb.kKey.isPressed && !kb.lKey.isPressed);
 
         if (keyUp && Mathf.Abs(sin) < 0.05f)
         {
-            transform.localRotation = Quaternion.identity;
+            transform.rotation = baseRotation;
             currentEmotion = "";
             emotionTimer = 0f;
         }
@@ -149,6 +163,7 @@ public class CatController_NewInput : MonoBehaviour
         isFlipping = true;
         flipDir = dir;
         flipTimer = 0f;
+        flipBaseRotation = transform.rotation; // 현재 회전값 저장
     }
 
     void HandleFlip()
@@ -160,15 +175,16 @@ public class CatController_NewInput : MonoBehaviour
         float height = Mathf.Sin(Mathf.Clamp01(t) * Mathf.PI) * flipHeight;
         transform.position = new Vector3(transform.position.x, startPos.y + height, transform.position.z);
 
-        // 2) 회전 (한 바퀴)
+        // 2) 상대 회전 (현재 바라보는 방향 기준으로 앞뒤 회전)
         float angle = 360f * t;
-        transform.rotation = Quaternion.Euler(flipDir * angle);
+        Quaternion relative = Quaternion.Euler(flipDir * angle);
+        transform.rotation = flipBaseRotation * relative;
 
         // 3) 착지 후 복귀
         if (flipTimer >= flipDuration)
         {
             isFlipping = false;
-            transform.rotation = Quaternion.identity;
+            transform.rotation = flipBaseRotation;
             transform.position = new Vector3(transform.position.x, startPos.y, transform.position.z);
         }
     }
