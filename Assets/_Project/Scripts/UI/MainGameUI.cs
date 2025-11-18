@@ -72,6 +72,29 @@ namespace PerfectButler.UI
         
         private void SetupButtons()
         {
+            // 버튼들이 null인지 확인
+            if (feedButton == null)
+            {
+                Debug.LogError("feedButton이 할당되지 않았습니다! Inspector에서 feedButton을 할당해주세요.");
+                return;
+            }
+            if (cleanButton == null)
+            {
+                Debug.LogError("cleanButton이 할당되지 않았습니다! Inspector에서 cleanButton을 할당해주세요.");
+                return;
+            }
+            if (playButton == null)
+            {
+                Debug.LogError("playButton이 할당되지 않았습니다! Inspector에서 playButton을 할당해주세요.");
+                return;
+            }
+            if (hospitalButton == null)
+            {
+                Debug.LogError("hospitalButton이 할당되지 않았습니다! Inspector에서 hospitalButton을 할당해주세요.");
+                return;
+            }
+
+            // 버튼 이벤트 연결
             feedButton.onClick.AddListener(() => TryAction(StatType.Hunger, 25f, ActionExpReward.FEED_CAT, "밥주기"));
             cleanButton.onClick.AddListener(() => TryAction(StatType.Cleanliness, 10f, ActionExpReward.CLEAN_DUST, "청소하기"));
             playButton.onClick.AddListener(() => TryAction(StatType.Fun, 15f, ActionExpReward.PLAY_MINIGAME, "놀아주기"));
@@ -93,12 +116,14 @@ namespace PerfectButler.UI
             {
                 case StatType.Hunger:
                     feedCount++;
-                    feedCatQuest.isOn = feedCount >= 5;
+                    if (feedCatQuest != null)
+                        feedCatQuest.isOn = feedCount >= 5;
                     break;
                     
                 case StatType.Fun:
                     playCount++;
-                    playCatQuest.isOn = playCount >= 10;
+                    if (playCatQuest != null)
+                        playCatQuest.isOn = playCount >= 10;
                     break;
                     
                 case StatType.Cleanliness:
@@ -106,7 +131,8 @@ namespace PerfectButler.UI
                     if (catStats.Cleanliness >= 90f)
                     {
                         isHouseCleaned = true;
-                        cleanHouseQuest.isOn = true;
+                        if (cleanHouseQuest != null)
+                            cleanHouseQuest.isOn = true;
                     }
                     break;
             }
@@ -119,16 +145,28 @@ namespace PerfectButler.UI
             switch (statType)
             {
                 case StatType.Hunger:
-                    hungerBar.value = normalizedValue;
+                    if (hungerBar != null)
+                        hungerBar.value = normalizedValue;
+                    else
+                        Debug.LogWarning("hungerBar가 할당되지 않았습니다.");
                     break;
                 case StatType.Cleanliness:
-                    cleanlinessBar.value = normalizedValue;
+                    if (cleanlinessBar != null)
+                        cleanlinessBar.value = normalizedValue;
+                    else
+                        Debug.LogWarning("cleanlinessBar가 할당되지 않았습니다.");
                     break;
                 case StatType.Fun:
-                    funBar.value = normalizedValue;
+                    if (funBar != null)
+                        funBar.value = normalizedValue;
+                    else
+                        Debug.LogWarning("funBar가 할당되지 않았습니다.");
                     break;
                 case StatType.Health:
-                    healthBar.value = normalizedValue;
+                    if (healthBar != null)
+                        healthBar.value = normalizedValue;
+                    else
+                        Debug.LogWarning("healthBar가 할당되지 않았습니다.");
                     break;
             }
         }
@@ -136,22 +174,27 @@ namespace PerfectButler.UI
         private void UpdateLevelUI(int level, float exp, string levelName)
         {
             // 레벨 텍스트 업데이트
-            levelText.text = $"Lv.{level + 1} {levelName}";
+            if (levelText != null)
+                levelText.text = $"Lv.{level + 1} {levelName}";
             
             // 경험치 원형 바 업데이트
             float expPercentage = exp / LevelData.EXP_PER_LEVEL;
-            expCircle.fillAmount = expPercentage;
+            if (expCircle != null)
+                expCircle.fillAmount = expPercentage;
             
             // 경험치 상태 텍스트
-            if (expPercentage < 0.3f)
-                expStatusText.text = "초보";
-            else if (expPercentage < 0.7f)
-                expStatusText.text = "성장중";
-            else
-                expStatusText.text = "거의다";
+            if (expStatusText != null)
+            {
+                if (expPercentage < 0.3f)
+                    expStatusText.text = "초보";
+                else if (expPercentage < 0.7f)
+                    expStatusText.text = "성장중";
+                else
+                    expStatusText.text = "거의다";
+            }
             
             // 레벨업 퀘스트 체크
-            if (catStats.CurrentLevel > initialLevel)
+            if (catStats.CurrentLevel > initialLevel && levelUpQuest != null)
             {
                 levelUpQuest.isOn = true;
             }
@@ -167,6 +210,12 @@ namespace PerfectButler.UI
         
         private void UpdateCooltimeText(StatType statType, TextMeshProUGUI cooltimeText)
         {
+            if (cooltimeText == null)
+            {
+                Debug.LogWarning($"{statType}에 대한 쿨타임 텍스트가 할당되지 않았습니다.");
+                return;
+            }
+
             if (catStats.CanPerformAction(statType))
             {
                 cooltimeText.text = "사용가능";
