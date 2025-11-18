@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "PerfectButler-3.slnx"
+    "dotnet.defaultSolution": "PerfectButler-1.slnx"
 }
