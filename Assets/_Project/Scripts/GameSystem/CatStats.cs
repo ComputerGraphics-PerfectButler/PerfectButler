@@ -37,6 +37,7 @@ namespace PerfectButler.GameSystem
         // 이벤트 시스템
         public static event Action<StatType, float> OnStatChanged;
         public static event Action<int, float, string> OnLevelChanged; // level, exp, levelName
+        public static event Action<float, float> OnExperienceChanged; // currentExp, maxExp (새로 추가!)
         public static event Action OnGameOver;
         public static event Action OnGameComplete;
         
@@ -162,7 +163,10 @@ namespace PerfectButler.GameSystem
         private void ModifyExperience(float amount)
         {
             experience += amount;
-            
+
+            // 경험치 변경 이벤트 발생 (UI 업데이트용)
+            OnExperienceChanged?.Invoke(experience, LevelData.EXP_PER_LEVEL);
+
             // 레벨업 체크
             if (experience >= LevelData.EXP_PER_LEVEL)
             {
@@ -170,9 +174,12 @@ namespace PerfectButler.GameSystem
                 {
                     currentLevel++;
                     experience = 0f;
-                    
+
                     Debug.Log($"레벨업! 현재 레벨: {CurrentLevelName}");
                     OnLevelChanged?.Invoke(currentLevel, experience, CurrentLevelName);
+
+                    // 레벨업 후 경험치 다시 전송
+                    OnExperienceChanged?.Invoke(experience, LevelData.EXP_PER_LEVEL);
                 }
                 else
                 {
