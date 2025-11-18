@@ -61,9 +61,10 @@ public class ParkPlayerMovement : MonoBehaviour
 
         // *** 중력 처리 ***
         if (controller.isGrounded)
-            yVelocity = -1f;  
+            yVelocity = 0f;
         else
             yVelocity += gravity * Time.deltaTime;
+
 
         Vector3 move = moveDir * moveSpeed + new Vector3(0, yVelocity, 0);
 
