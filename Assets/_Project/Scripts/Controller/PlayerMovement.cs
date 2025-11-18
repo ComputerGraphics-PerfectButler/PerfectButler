@@ -29,19 +29,19 @@ public class PlayerMovement : MonoBehaviour
         bool right = keyboard.dKey.isPressed;
 
         if (up && down) v = 0f;
-        else if (up) v -= 1f;
-        else if (down) v += 1f;
+        else if (up) v += 1f;
+        else if (down) v -= 1f;
 
         if (left && right) h = 0f;
-        else if (right) h -= 1f;
-        else if (left) h += 1f;
+        else if (right) h += 1f;
+        else if (left) h -= 1f;
 
         Vector3 moveDir = new Vector3(h, 0, v).normalized;
 
         if (moveDir != Vector3.zero)
         {
-            // ✅ 방향 반전 (moveDir)
-            Quaternion targetRotation = Quaternion.LookRotation(moveDir);
+            // ✅ 방향 반전 (-moveDir)
+            Quaternion targetRotation = Quaternion.LookRotation(-moveDir);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
             controller.Move(moveDir * moveSpeed * Time.deltaTime);
