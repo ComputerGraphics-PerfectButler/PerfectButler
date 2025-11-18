@@ -42,6 +42,9 @@ namespace PerfectButler.UI
         // private bool isHouseCleaned = false;
         // private int initialLevel = 0;
 
+        [Header("Mini Game Popup")]
+        [SerializeField] private MiniGameSelectionPopup miniGamePopup;
+
         private CatStats catStats;
 
         private void Start()
@@ -75,10 +78,36 @@ namespace PerfectButler.UI
         {
             feedButton.onClick.AddListener(() => catStats.TryPerformAction(StatType.Hunger, 25f, ActionExpReward.FEED_CAT, "밥주기"));
             cleanButton.onClick.AddListener(() => catStats.TryPerformAction(StatType.Cleanliness, 10f, ActionExpReward.CLEAN_DUST, "청소하기"));
-            playButton.onClick.AddListener(() => catStats.TryPerformAction(StatType.Fun, 15f, ActionExpReward.PLAY_MINIGAME, "놀아주기"));
+            // playButton.onClick.AddListener(() => catStats.TryPerformAction(StatType.Fun, 15f, ActionExpReward.PLAY_MINIGAME, "놀아주기"));
             hospitalButton.onClick.AddListener(() => catStats.TryPerformAction(StatType.Health, 100f, ActionExpReward.HOSPITAL_VISIT, "병원가기"));
+
+            // 놀아주기는 먼저 쿨타임 체크 후 팝업 열기
+            playButton.onClick.AddListener(OnPlayButtonClicked);
         }
         
+        /// 놀아주기 버튼 클릭 시 - 쿨타임 체크 후 미니게임 선택 팝업 열기
+        private void OnPlayButtonClicked()
+        {
+            // 쿨타임 체크
+            if (!catStats.CanPerformAction(StatType.Fun))
+            {
+                float remaining = catStats.GetRemainingCooltime(StatType.Fun);
+                Debug.Log($"놀아주기 쿨타임 중... {remaining:F1}초 남음");
+                // TODO: 쿨타임 알림 UI 표시
+                return;
+            }
+            
+            // 쿨타임이 없다면 미니게임 선택 팝업 열기
+            if (miniGamePopup != null)
+            {
+                miniGamePopup.ShowPopup();
+            }
+            else
+            {
+                Debug.LogError("MiniGameSelectionPopup이 연결되지 않았습니다!");
+            }
+        }
+
         // private void TryAction(StatType statType, float statIncrease, float expReward, string actionName)
         // {
         //     if (catStats.TryPerformAction(statType, statIncrease, expReward, actionName))
