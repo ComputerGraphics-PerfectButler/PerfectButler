@@ -2,27 +2,33 @@ using UnityEngine;
 
 public enum CatItem
 {
-    None, // 0
-    Snack, // 1
-    LaserPointer, // 2
-    ToyMouse, // 3
-    Brush // 4
+    None,           // 0
+    Toy1,           // 1 - 장난감1
+    Toy2,           // 2 - 장난감2
+    ToyMouse,       // 3 - 쥐돌이 장난감
+    Churu,          // 4 - 츄르
+    Scratcher       // 5 - 스크래쳐
 }
 
 public class PlayerInventory : MonoBehaviour
 {
     public CatItem currentItem = CatItem.None;
 
+    void Start()
+    {
+        Debug.Log($"[PlayerInventory] 초기화됨. 시작 아이템: {currentItem}");
+    }
+
     public void AcquireItem(int itemIndex)
     {
-        // 정수(int)로 받은 인덱스를 CatItem Enum으로 변환합니다.
         currentItem = (CatItem)itemIndex;
-        Debug.Log($"[인벤토리]: {currentItem} 획득! 이제 고양이에게 사용할 수 있습니다.");
+        Debug.Log($"★★★ [인벤토리]: {currentItem} 획득! (인덱스: {itemIndex}) 이제 고양이에게 사용할 수 있습니다. ★★★");
     }
 
     public void ClearItem()
     {
+        Debug.Log($"[인벤토리]: {currentItem}을(를) 사용했습니다.");
         currentItem = CatItem.None;
-        Debug.Log("[인벤토리]: 아이템을 사용했습니다. 인벤토리가 비었습니다.");
+        Debug.Log("[인벤토리]: 인벤토리가 비었습니다.");
     }
 }
