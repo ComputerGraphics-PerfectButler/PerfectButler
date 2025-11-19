@@ -28,9 +28,7 @@ namespace PerfectButler.UI
             popupPanel?.SetActive(false);
         }
         
-        /// <summary>
         /// 팝업을 표시합니다
-        /// </summary>
         public void ShowPopup()
         {
             popupPanel?.SetActive(true);
@@ -38,9 +36,7 @@ namespace PerfectButler.UI
             Debug.Log("미니게임 선택 팝업 열림");
         }
         
-        /// <summary>
         /// 팝업을 닫습니다
-        /// </summary>
         public void ClosePopup()
         {
             popupPanel?.SetActive(false);
@@ -48,9 +44,7 @@ namespace PerfectButler.UI
             Debug.Log("미니게임 선택 팝업 닫힘");
         }
         
-        /// <summary>
         /// 낚싯대 흔들기 게임 시작
-        /// </summary>
         private void OnFishingRodButtonClicked()
         {
             Debug.Log("낚싯대 흔들기 게임 시작");
@@ -63,9 +57,7 @@ namespace PerfectButler.UI
             SceneManager.LoadScene(fishingRodSceneName);
         }
         
-        /// <summary>
         /// 두더지잡기 게임 시작
-        /// </summary>
         private void OnWhackAMoleButtonClicked()
         {
             Debug.Log("두더지잡기 게임 시작");
