@@ -6,24 +6,40 @@ namespace PerfectButler.GameSystem
 {
     public class CatStats : MonoBehaviour
     {
+        public static CatStats Instance { get; private set; }
+
         [Header("Cat Stats")]
         [SerializeField, Range(0, 100)] private float hunger = 80f;
         [SerializeField, Range(0, 100)] private float cleanliness = 80f;
         [SerializeField, Range(0, 100)] private float fun = 80f;
         [SerializeField, Range(0, 100)] private float health = 80f;
-        
+
         [Header("Level System")]
         [SerializeField, Range(0, 100)] private float experience = 0f;
         [SerializeField] private int currentLevel = 0; // 0-4 (왕초보~완벽한집사)
-        
+
         [Header("Stat Decrease Settings")]
         [SerializeField] private float baseDecreaseRate = 0.5f; // 기본 감소량 (초당)
-        
+
         [Header("Cooltime System")]
         [SerializeField] private bool showCooltime = true; // Inspector에서 쿨타임 표시 여부
-        
+
         // 쿨타임 추적용 Dictionary
         private Dictionary<StatType, float> lastActionTime = new Dictionary<StatType, float>();
+
+        private void Awake()
+        {
+            // 싱글톤 패턴 적용
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
         
         // 프로퍼티로 외부 접근
         public float Hunger => hunger;
@@ -118,15 +134,26 @@ namespace PerfectButler.GameSystem
                 Debug.Log($"{actionName} 쿨타임 중... {remaining:F1}초 남음");
                 return false;
             }
-            
+
             // 액션 수행
             ModifyStat(statType, statIncrease);
             GainExperienceFromAction(expReward, actionName);
-            
+
             // 쿨타임 기록
             lastActionTime[statType] = Time.time;
-            
+
             return true;
+        }
+
+        // 쿨타임 체크 없이 강제로 액션 수행 (미니게임 보상 등에 사용)
+        public void PerformActionWithoutCooldownCheck(StatType statType, float statIncrease, float expReward, string actionName)
+        {
+            // 액션 수행
+            ModifyStat(statType, statIncrease);
+            GainExperienceFromAction(expReward, actionName);
+
+            // 쿨타임 기록 (다음 액션을 위해)
+            lastActionTime[statType] = Time.time;
         }
         
         public void ModifyStat(StatType statType, float amount)

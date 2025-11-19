@@ -1,27 +1,45 @@
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+namespace PerfectButler.GameSystem
 {
-    public static GameManager Instance;
-    
-    [Header("Game State")]
-    public bool isGameStarted = false;
-    
-    void Awake()
+    public class GameManager : MonoBehaviour
     {
-        if (Instance == null)
+        public static GameManager Instance { get; private set; }
+
+        [Header("Game State")]
+        public bool isGameStarted = false;
+
+        [Header("References")]
+        public CatStats CatStats { get; private set; }
+
+        void Awake()
         {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+
+                // CatStats 참조 찾기 (같은 오브젝트 또는 자식)
+                CatStats = GetComponentInChildren<CatStats>();
+                if (CatStats == null)
+                {
+                    CatStats = FindObjectOfType<CatStats>();
+                }
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
         }
-        else
+
+        void Start()
         {
-            Destroy(gameObject);
+            Debug.Log("PerfectButler Game Started!");
+
+            if (CatStats == null)
+            {
+                Debug.LogWarning("CatStats를 찾을 수 없습니다. CatStats 오브젝트가 씬에 있는지 확인하세요.");
+            }
         }
-    }
-    
-    void Start()
-    {
-        Debug.Log("MeowChoice Game Started!");
     }
 }
