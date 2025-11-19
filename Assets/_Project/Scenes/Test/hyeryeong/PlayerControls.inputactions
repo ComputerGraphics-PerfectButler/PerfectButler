@@ -7,7 +7,7 @@
             "id": "3e8890f0-6118-4fad-8b25-9619463c7170",
             "actions": [
                 {
-                    "name": "New action",
+                    "name": "InteractWithCat",
                     "type": "Button",
                     "id": "27f9db12-3fb4-4d36-b157-cd1090cdf962",
                     "expectedControlType": "",
@@ -29,11 +29,11 @@
                 {
                     "name": "",
                     "id": "7b6b1e85-c0a1-4c15-882c-b8aa80fdfae4",
-                    "path": "",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "New action",
+                    "action": "InteractWithCat",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -41,17 +41,6 @@
                     "name": "",
                     "id": "e3220d8f-bf16-4001-99bb-dfb26862a91c",
                     "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Interact",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "d5dbfd0c-bcc1-4bd6-8d22-23230a4126fd",
-                    "path": "",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
