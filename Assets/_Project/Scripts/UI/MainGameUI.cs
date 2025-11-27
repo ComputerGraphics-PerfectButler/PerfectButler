@@ -96,8 +96,11 @@ namespace PerfectButler.UI
                 // TODO: 쿨타임 알림 UI 표시
                 return;
             }
-            
-            // 쿨타임이 없다면 미니게임 선택 팝업 열기
+
+            // 쿨타임이 없다면 쿨타임을 먼저 기록하고 미니게임 선택 팝업 열기
+            // (미니게임 결과는 MiniGameResultHandler에서 처리됨)
+            catStats.RecordActionCooldown(StatType.Fun);
+
             if (miniGamePopup != null)
             {
                 miniGamePopup.ShowPopup();

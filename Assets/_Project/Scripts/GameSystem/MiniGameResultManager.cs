@@ -2,9 +2,7 @@ using UnityEngine;
 
 namespace PerfectButler.GameSystem
 {
-    /// <summary>
     /// 미니게임 완료 후 결과를 저장하고 전달하는 정적 클래스
-    /// </summary>
     public static class MiniGameResultManager
     {
         // 마지막 미니게임 결과
@@ -23,10 +21,8 @@ namespace PerfectButler.GameSystem
             LastResult = MiniGameResult.Normal;
         }
     }
-    
-    /// <summary>
+
     /// 미니게임 타입 정의
-    /// </summary>
     public enum MiniGameType
     {
         FishingRod,   // 낚싯대 흔들기

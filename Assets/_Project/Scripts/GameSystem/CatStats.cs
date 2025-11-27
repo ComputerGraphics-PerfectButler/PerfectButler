@@ -145,6 +145,13 @@ namespace PerfectButler.GameSystem
             return true;
         }
 
+        // 쿨타임만 기록하는 메서드 (미니게임 시작 시 사용)
+        public void RecordActionCooldown(StatType statType)
+        {
+            lastActionTime[statType] = Time.time;
+            Debug.Log($"{statType} 쿨타임 기록됨");
+        }
+
         // 쿨타임 체크 없이 강제로 액션 수행 (미니게임 보상 등에 사용)
         public void PerformActionWithoutCooldownCheck(StatType statType, float statIncrease, float expReward, string actionName)
         {

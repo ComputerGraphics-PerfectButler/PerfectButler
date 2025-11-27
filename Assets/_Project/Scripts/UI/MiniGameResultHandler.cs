@@ -72,13 +72,9 @@ namespace PerfectButler.UI
                 _ => 15f
             };
 
-            // 스탯 및 경험치 적용 + 쿨타임 기록
-            CatStats.Instance.PerformActionWithoutCooldownCheck(
-                StatType.Fun,
-                funIncrease,
-                expReward,
-                $"미니게임 완료 ({result})"
-            );
+            // 스탯 및 경험치 적용 (쿨타임은 이미 미니게임 시작 시 기록되었음)
+            CatStats.Instance.ModifyStat(StatType.Fun, funIncrease);
+            CatStats.Instance.GainExperienceFromAction(expReward, $"미니게임 완료 ({result})");
 
             Debug.Log($"미니게임 보상 지급 완료: 재미 +{funIncrease}, 경험치 +{expReward}");
         }

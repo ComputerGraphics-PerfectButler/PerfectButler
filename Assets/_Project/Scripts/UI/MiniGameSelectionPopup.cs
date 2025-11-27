@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using PerfectButler.GameSystem;
 
 namespace PerfectButler.UI
 {
@@ -12,7 +13,7 @@ namespace PerfectButler.UI
         [SerializeField] private Button fishingRodButton;
         [SerializeField] private Button whackAMoleButton;
         [SerializeField] private Button closeButton;
-        
+
         [Header("Scene Names")]
         [SerializeField] private string fishingRodSceneName = "MiniGame_FishingRod";
         [SerializeField] private string whackAMoleSceneName = "MiniGame_WhackAMole";
@@ -48,26 +49,30 @@ namespace PerfectButler.UI
         private void OnFishingRodButtonClicked()
         {
             Debug.Log("낚싯대 흔들기 게임 시작");
-            Time.timeScale = 1f; // 씬 전환 전에 시간 정상화
-            
-            // 현재 씬 이름 저장 (돌아올 때 사용)
-            PlayerPrefs.SetString("PreviousScene", SceneManager.GetActiveScene().name);
-            
-            // 미니게임 씬으로 전환
-            SceneManager.LoadScene(fishingRodSceneName);
+            StartMiniGame(fishingRodSceneName);
         }
-        
+
         /// 두더지잡기 게임 시작
         private void OnWhackAMoleButtonClicked()
         {
             Debug.Log("두더지잡기 게임 시작");
+            StartMiniGame(whackAMoleSceneName);
+        }
+
+        /// 미니게임 시작 공통 로직 - 쿨타임 기록 후 씬 전환
+        private void StartMiniGame(string sceneName)
+        {
             Time.timeScale = 1f; // 씬 전환 전에 시간 정상화
-            
+
             // 현재 씬 이름 저장 (돌아올 때 사용)
             PlayerPrefs.SetString("PreviousScene", SceneManager.GetActiveScene().name);
-            
+
+            // 미니게임 플레이 표시 저장 (결과 처리용)
+            PlayerPrefs.SetInt("JustPlayedMiniGame", 1);
+            PlayerPrefs.Save();
+
             // 미니게임 씬으로 전환
-            SceneManager.LoadScene(whackAMoleSceneName);
+            SceneManager.LoadScene(sceneName);
         }
         
         private void OnDestroy()

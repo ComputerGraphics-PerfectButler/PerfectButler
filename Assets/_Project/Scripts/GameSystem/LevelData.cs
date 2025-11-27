@@ -34,7 +34,7 @@ namespace PerfectButler.GameSystem
     {
         public const float FEED_CAT = 60f;       // 밥주기: 1분
         public const float CLEAN_DUST = 0f;      // 청소: 0초
-        public const float PLAY_MINIGAME = 60f;  // 놀아주기: 1분 (미니게임이라 조금 길게)
+        public const float PLAY_MINIGAME = 30f;  // 놀아주기: 30초 (미니게임이라 조금 길게)
         public const float HOSPITAL_VISIT = 180f; // 병원: 3분 (큰 행동이니 길게)
     }
     
