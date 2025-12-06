@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement; // 씬 이동
 
 public class CatInteraction : MonoBehaviour
 {
@@ -124,6 +125,9 @@ public class CatInteraction : MonoBehaviour
         {
             playerInventory.ClearItem();
             Debug.Log("✅ 성공! 고양이가 따라옵니다!");
+
+
+            OnCatCaught(); // 고양이 획득 후 방으로 이동
         }
         else
         {
@@ -145,134 +149,11 @@ public class CatInteraction : MonoBehaviour
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, interactionDistance);
     }
+
+    // 고양이와 상호작용(냥줍) 성공 시 호출될 함수
+    public void OnCatCaught()
+    {
+        Debug.Log("고양이 획득! 방으로 이동합니다.");
+        SceneManager.LoadScene("room"); 
+    }
 }
-
-// using UnityEngine;
-// using UnityEngine.InputSystem;
-
-// public class CatInteraction : MonoBehaviour
-// {
-//     [Header("Interaction Settings")]
-//     public float interactionDistance = 3f;
-    
-//     [Header("UI (Optional)")]
-//     public GameObject interactionPrompt;
-
-//     private PlayerInventory playerInventory;
-//     private CatWanderAI nearestCat;
-
-//     void Start()
-//     {
-//         // ✅ 수정: 이 스크립트가 Player에 붙어있으므로 GetComponent로 직접 가져오기
-//         playerInventory = GetComponent<PlayerInventory>();
-        
-//         // 혹시 다른 오브젝트에 붙어있다면 FindObjectOfType으로 찾기
-//         if (playerInventory == null)
-//         {
-//             playerInventory = FindObjectOfType<PlayerInventory>();
-//         }
-        
-//         if (playerInventory == null)
-//         {
-//             Debug.LogError("[CatInteraction] PlayerInventory를 찾을 수 없습니다!");
-//         }
-//         else
-//         {
-//             Debug.Log($"[CatInteraction] PlayerInventory 찾음! 현재 아이템: {playerInventory.currentItem}");
-//         }
-
-//         if (interactionPrompt != null)
-//             interactionPrompt.SetActive(false);
-//     }
-
-//     void Update()
-//     {
-//         FindNearestCat();
-//         UpdateUI();
-//     }
-
-//     void FindNearestCat()
-//     {
-//         CatWanderAI[] allCats = FindObjectsOfType<CatWanderAI>();
-//         CatWanderAI closest = null;
-//         float closestDist = interactionDistance;
-
-//         foreach (CatWanderAI cat in allCats)
-//         {
-//             float dist = Vector3.Distance(transform.position, cat.transform.position);
-            
-//             if (dist < closestDist)
-//             {
-//                 closestDist = dist;
-//                 closest = cat;
-//             }
-//         }
-
-//         nearestCat = closest;
-        
-//         // ✅ 디버그: 가장 가까운 고양이 정보 출력
-//         if (nearestCat != null)
-//         {
-//             Debug.Log($"[CatInteraction] 가장 가까운 고양이: {nearestCat.catName}, 거리: {Vector3.Distance(transform.position, nearestCat.transform.position):F2}m");
-//         }
-//     }
-
-//     void UpdateUI()
-//     {
-//         if (interactionPrompt != null)
-//         {
-//             bool canInteract = (nearestCat != null && playerInventory != null && playerInventory.currentItem != CatItem.None);
-//             interactionPrompt.SetActive(canInteract);
-//         }
-//     }
-
-//     // E키 (New Input System)
-//     public void OnInteractWithCat(InputAction.CallbackContext context)
-//     {
-//         Debug.Log($"[CatInteraction] OnInteractWithCat 호출됨! performed: {context.performed}");
-        
-//         if (!context.performed)
-//         {
-//             Debug.Log("[CatInteraction] context.performed가 false입니다.");
-//             return;
-//         }
-        
-//         if (nearestCat == null)
-//         {
-//             Debug.Log("[CatInteraction] 근처에 고양이가 없습니다.");
-//             return;
-//         }
-        
-//         if (playerInventory == null)
-//         {
-//             Debug.LogError("[CatInteraction] PlayerInventory가 null입니다!");
-//             return;
-//         }
-        
-//         if (playerInventory.currentItem == CatItem.None)
-//         {
-//             Debug.Log("[CatInteraction] 인벤토리에 아이템이 없습니다.");
-//             return;
-//         }
-
-//         Debug.Log($"[상호작용] {nearestCat.catName}에게 {playerInventory.currentItem} 제공");
-
-//         bool accepted = nearestCat.TryAcceptItem(playerInventory.currentItem, transform);
-
-//         if (accepted)
-//         {
-//             playerInventory.ClearItem();
-//             Debug.Log("✅ 성공! 고양이가 따라옵니다!");
-//         }
-//         else
-//         {
-//             Debug.Log("❌ 실패! 다른 아이템을 시도해보세요.");
-//         }
-//     }
-
-//     void OnDrawGizmosSelected()
-//     {
-//         Gizmos.color = Color.cyan;
-//         Gizmos.DrawWireSphere(transform.position, interactionDistance);
-//     }
-// }
