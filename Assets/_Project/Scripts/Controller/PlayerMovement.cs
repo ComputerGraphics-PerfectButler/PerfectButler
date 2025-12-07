@@ -6,6 +6,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float rotationSpeed = 10f;
+    public float fixedY = 0.3394098f; // Y값 고정
 
     private CharacterController controller;
     private Animator animator;
@@ -14,6 +15,11 @@ public class PlayerMovement : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
+        
+        // 시작 시 Y 위치를 고정값으로 설정
+        Vector3 startPos = transform.position;
+        startPos.y = fixedY;
+        transform.position = startPos;
     }
 
     void Update()
@@ -40,7 +46,6 @@ public class PlayerMovement : MonoBehaviour
 
         if (moveDir != Vector3.zero)
         {
-            // ✅ 방향 반전 (moveDir)
             Quaternion targetRotation = Quaternion.LookRotation(moveDir);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
@@ -50,6 +55,13 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             animator?.SetBool("isWalking", false);
+        }
+
+        // Y 고정: 현재 Y와 목표 Y의 차이만큼 보정
+        float yDifference = fixedY - transform.position.y;
+        if (Mathf.Abs(yDifference) > 0.0001f)
+        {
+            controller.Move(new Vector3(0, yDifference, 0));
         }
     }
 }
