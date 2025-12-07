@@ -23,8 +23,10 @@ public class ParkPlayerMovement : MonoBehaviour
     {
         var keyboard = Keyboard.current;
 
-        float h = 0f;
-        float v = 0f;
+        // float h = 0f;
+        // float v = 0f;
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
 
         bool up = keyboard.wKey.isPressed;
         bool down = keyboard.sKey.isPressed;
@@ -39,6 +41,12 @@ public class ParkPlayerMovement : MonoBehaviour
         if (left && right) h = 0f;
         else if (right) h += 1f;
         else if (left) h -= 1f;
+
+        // 이동 입력이 있는지 확인 (키를 조금이라도 눌렀으면 true)
+        bool isMoving = (h != 0 || v != 0);
+
+        // 애니메이터에게 알려줌 (Animator 창의 파라미터 이름이 "isWalk"라고 가정)
+        animator.SetBool("isWalk", isMoving);
 
         // *** 카메라 기준 이동 방향 계산 ***
         Vector3 camForward = Camera.main.transform.forward;
