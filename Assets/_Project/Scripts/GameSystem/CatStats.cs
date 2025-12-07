@@ -59,11 +59,20 @@ namespace PerfectButler.GameSystem
         
         private void Start()
         {
+            // 저장된 데이터가 있으면 불러오기
+            if (HasSaveData())
+            {
+                LoadGameData();
+            }
+
             // 스탯 자동 감소만 시작 (경험치 자동증가 제거)
             InvokeRepeating(nameof(DecreaseStats), 1f, 1f);
             
             // 쿨타임 Dictionary 초기화
             InitializeCooltime();
+            
+            // 60초마다 자동 저장
+            InvokeRepeating(nameof(AutoSave), 60f, 60f);
         }
         
         private void InitializeCooltime()
@@ -277,6 +286,109 @@ namespace PerfectButler.GameSystem
                 string status = CanPerformAction(statType) ? "사용가능" : $"{remaining:F1}초 남음";
                 Debug.Log($"{statType}: {status}");
             }
+        }
+
+        // ===== 저장/불러오기 시스템 =====
+        /// 현재 게임 상태를 저장합니다
+        public void SaveGameData()
+        {
+            // 현재 Scene 이름 저장
+            string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            PlayerPrefs.SetString("SavedScene", currentScene);
+            
+            // 레벨 & 경험치
+            PlayerPrefs.SetInt("SavedLevel", currentLevel);
+            PlayerPrefs.SetFloat("SavedExp", experience);
+            
+            // 4가지 스탯
+            PlayerPrefs.SetFloat("SavedHunger", hunger);
+            PlayerPrefs.SetFloat("SavedCleanliness", cleanliness);
+            PlayerPrefs.SetFloat("SavedFun", fun);
+            PlayerPrefs.SetFloat("SavedHealth", health);
+            
+            // 저장 시간 기록
+            PlayerPrefs.SetString("SavedTime", System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            
+            PlayerPrefs.Save();
+            
+            Debug.Log($"게임 저장 완료! Scene: {currentScene}, Lv.{CurrentLevelName}, Exp: {experience:F0}");
+        }
+
+        /// 저장된 게임 상태를 불러옵니다
+        public void LoadGameData()
+        {
+            if (!HasSaveData())
+            {
+                Debug.LogWarning("저장된 데이터가 없습니다!");
+                return;
+            }
+            
+            // 레벨 & 경험치 복구
+            currentLevel = PlayerPrefs.GetInt("SavedLevel", 0);
+            experience = PlayerPrefs.GetFloat("SavedExp", 0f);
+            
+            // 4가지 스탯 복구
+            hunger = PlayerPrefs.GetFloat("SavedHunger", 80f);
+            cleanliness = PlayerPrefs.GetFloat("SavedCleanliness", 80f);
+            fun = PlayerPrefs.GetFloat("SavedFun", 80f);
+            health = PlayerPrefs.GetFloat("SavedHealth", 80f);
+            
+            string savedTime = PlayerPrefs.GetString("SavedTime", "Unknown");
+            Debug.Log($"게임 불러오기 완료! Lv.{CurrentLevelName}, Exp: {experience:F0} (저장시간: {savedTime})");
+            
+            // UI 업데이트를 위해 이벤트 발생
+            OnLevelChanged?.Invoke(currentLevel, experience, CurrentLevelName);
+            OnExperienceChanged?.Invoke(experience, LevelData.EXP_PER_LEVEL);
+            OnStatChanged?.Invoke(StatType.Hunger, hunger);
+            OnStatChanged?.Invoke(StatType.Cleanliness, cleanliness);
+            OnStatChanged?.Invoke(StatType.Fun, fun);
+            OnStatChanged?.Invoke(StatType.Health, health);
+        }
+
+        /// 저장된 게임 데이터가 있는지 확인
+        public static bool HasSaveData()
+        {
+            return PlayerPrefs.HasKey("SavedLevel") && PlayerPrefs.HasKey("SavedScene");
+        }
+        /// 모든 저장 데이터 삭제
+        public static void ClearSaveData()
+        {
+            PlayerPrefs.DeleteKey("SavedLevel");
+            PlayerPrefs.DeleteKey("SavedExp");
+            PlayerPrefs.DeleteKey("SavedScene");
+            PlayerPrefs.DeleteKey("SavedHunger");
+            PlayerPrefs.DeleteKey("SavedCleanliness");
+            PlayerPrefs.DeleteKey("SavedFun");
+            PlayerPrefs.DeleteKey("SavedHealth");
+            PlayerPrefs.DeleteKey("SavedTime");
+            PlayerPrefs.Save();
+            Debug.Log("모든 저장 데이터를 삭제했습니다.");
+        }
+
+        // ===== 자동 저장 관련 =====
+        private float autoSaveInterval = 60f; // 60초마다 자동 저장
+        private float autoSaveTimer = 0f;
+
+        // Start() 메서드에 추가:
+        // InvokeRepeating(nameof(AutoSave), autoSaveInterval, autoSaveInterval);
+
+        private void AutoSave()
+        {
+            SaveGameData();
+            Debug.Log("자동 저장 완료!");
+        }
+
+        // ===== 테스트용 메서드 =====
+        [ContextMenu("Save Game")]
+        public void TestSaveGame()
+        {
+            SaveGameData();
+        }
+
+        [ContextMenu("Load Game")]
+        public void TestLoadGame()
+        {
+            LoadGameData();
         }
     }
 }
