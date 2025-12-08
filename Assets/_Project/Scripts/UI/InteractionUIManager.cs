@@ -11,29 +11,18 @@ public class InteractionUIManager : MonoBehaviour
     [Header("UI References")]
     public GameObject uiPanel; // UI 패널
     public Transform uiWorldPosition; // UI가 표시될 월드 좌표 (플레이어 머리 위)
-    public float uiHeightOffset = 2.5f; // 플레이어 머리 위 높이
+    public float uiHeightOffset = 5f; // 플레이어 머리 위 높이
 
-    [Header("Cat Interaction UI")]
+    [Header("Cat Interaction Buttons")]
     public GameObject catInteractionPanel;
-    public TextMeshProUGUI[] catOptionTexts; // 밥주기, 놀아주기, 병원보내기
+    public Button feedButton;      // 밥주기 버튼
+    public Button playButton;      // 놀아주기 버튼
+    public Button hospitalButton;  // 병원보내기 버튼
 
     [Header("Vacuum Cleaner UI")]
     public GameObject vacuumCleanerPanel;
-    public TextMeshProUGUI vacuumCleanerText;
+    public Button cleanButton;     // 청소하기 버튼
 
-    [Header("UI Settings")]
-    public Color normalColor = Color.white;
-    public Color selectedColor = Color.yellow;
-
-    // 고양이 상호작용 옵션
-    private enum CatInteractionOption
-    {
-        Feed = 0,      // 밥주기
-        Play = 1,      // 놀아주기
-        Hospital = 2   // 병원보내기
-    }
-
-    private CatInteractionOption currentSelection = CatInteractionOption.Feed;
     private bool isUIActive = false;
     private Transform playerTransform;
 
@@ -44,18 +33,51 @@ public class InteractionUIManager : MonoBehaviour
         // UI 초기화
         if (uiPanel != null)
             uiPanel.SetActive(false);
-        
+
         if (catInteractionPanel != null)
             catInteractionPanel.SetActive(false);
-        
+
         if (vacuumCleanerPanel != null)
             vacuumCleanerPanel.SetActive(false);
 
-        // 옵션 텍스트 초기화
-        if (catOptionTexts != null && catOptionTexts.Length > 0)
-        {
-            UpdateCatOptionTexts();
-        }
+        // 버튼 이벤트 리스너 등록
+        SetupButtonListeners();
+    }
+
+    /// <summary>
+    /// 버튼 이벤트 리스너 설정
+    /// </summary>
+    void SetupButtonListeners()
+    {
+        // 고양이 상호작용 버튼
+        if (feedButton != null)
+            feedButton.onClick.AddListener(OnFeedButtonClicked);
+
+        if (playButton != null)
+            playButton.onClick.AddListener(OnPlayButtonClicked);
+
+        if (hospitalButton != null)
+            hospitalButton.onClick.AddListener(OnHospitalButtonClicked);
+
+        // 청소기 버튼
+        if (cleanButton != null)
+            cleanButton.onClick.AddListener(OnCleanButtonClicked);
+    }
+
+    void OnDestroy()
+    {
+        // 버튼 이벤트 리스너 제거
+        if (feedButton != null)
+            feedButton.onClick.RemoveListener(OnFeedButtonClicked);
+
+        if (playButton != null)
+            playButton.onClick.RemoveListener(OnPlayButtonClicked);
+
+        if (hospitalButton != null)
+            hospitalButton.onClick.RemoveListener(OnHospitalButtonClicked);
+
+        if (cleanButton != null)
+            cleanButton.onClick.RemoveListener(OnCleanButtonClicked);
     }
 
     void Update()
@@ -82,7 +104,6 @@ public class InteractionUIManager : MonoBehaviour
     {
         playerTransform = player;
         isUIActive = true;
-        currentSelection = CatInteractionOption.Feed;
 
         if (uiPanel != null)
             uiPanel.SetActive(true);
@@ -92,8 +113,6 @@ public class InteractionUIManager : MonoBehaviour
 
         if (vacuumCleanerPanel != null)
             vacuumCleanerPanel.SetActive(false);
-
-        UpdateCatOptionTexts();
     }
 
     /// <summary>
@@ -112,12 +131,6 @@ public class InteractionUIManager : MonoBehaviour
 
         if (vacuumCleanerPanel != null)
             vacuumCleanerPanel.SetActive(true);
-
-        if (vacuumCleanerText != null)
-        {
-            vacuumCleanerText.text = "청소하기";
-            vacuumCleanerText.color = selectedColor;
-        }
     }
 
     /// <summary>
@@ -146,109 +159,73 @@ public class InteractionUIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 위로 이동 (고양이 메뉴에서만)
-    /// </summary>
-    public void NavigateUp()
-    {
-        if (!catInteractionPanel.activeSelf)
-            return;
-
-        // 순환: 밥주기 -> 병원보내기 -> 놀아주기 -> 밥주기
-        currentSelection = (CatInteractionOption)(((int)currentSelection - 1 + 3) % 3);
-        UpdateCatOptionTexts();
-    }
+    // ========== 버튼 클릭 이벤트 핸들러 ==========
 
     /// <summary>
-    /// 아래로 이동 (고양이 메뉴에서만)
+    /// 밥주기 버튼 클릭
     /// </summary>
-    public void NavigateDown()
-    {
-        if (!catInteractionPanel.activeSelf)
-            return;
-
-        // 순환: 밥주기 -> 놀아주기 -> 병원보내기 -> 밥주기
-        currentSelection = (CatInteractionOption)(((int)currentSelection + 1) % 3);
-        UpdateCatOptionTexts();
-    }
-
-    /// <summary>
-    /// 선택 확정
-    /// </summary>
-    public void ConfirmSelection()
-    {
-        if (catInteractionPanel.activeSelf)
-        {
-            // 고양이 상호작용 처리
-            ConfirmCatInteraction();
-        }
-        else if (vacuumCleanerPanel.activeSelf)
-        {
-            // 청소기 상호작용 처리
-            ConfirmVacuumCleanerInteraction();
-        }
-
-        // UI 숨기기
-        HideUI();
-    }
-
-    /// <summary>
-    /// 고양이 상호작용 확정 처리
-    /// </summary>
-    void ConfirmCatInteraction()
+    void OnFeedButtonClicked()
     {
         CatInteractionManager catManager = CatInteractionManager.Instance;
-        if (catManager == null)
+        if (catManager != null)
+        {
+            catManager.OnFeedAction();
+            HideUI();
+        }
+        else
         {
             Debug.LogWarning("CatInteractionManager를 찾을 수 없습니다!");
-            return;
-        }
-
-        switch (currentSelection)
-        {
-            case CatInteractionOption.Feed:
-                catManager.OnFeedAction();
-                break;
-
-            case CatInteractionOption.Play:
-                catManager.OnPlayAction();
-                break;
-
-            case CatInteractionOption.Hospital:
-                catManager.OnHospitalAction();
-                break;
         }
     }
 
     /// <summary>
-    /// 청소기 상호작용 확정 처리
+    /// 놀아주기 버튼 클릭
     /// </summary>
-    void ConfirmVacuumCleanerInteraction()
+    void OnPlayButtonClicked()
+    {
+        CatInteractionManager catManager = CatInteractionManager.Instance;
+        if (catManager != null)
+        {
+            catManager.OnPlayAction();
+            HideUI();
+        }
+        else
+        {
+            Debug.LogWarning("CatInteractionManager를 찾을 수 없습니다!");
+        }
+    }
+
+    /// <summary>
+    /// 병원보내기 버튼 클릭
+    /// </summary>
+    void OnHospitalButtonClicked()
+    {
+        CatInteractionManager catManager = CatInteractionManager.Instance;
+        if (catManager != null)
+        {
+            catManager.OnHospitalAction();
+            HideUI();
+        }
+        else
+        {
+            Debug.LogWarning("CatInteractionManager를 찾을 수 없습니다!");
+        }
+    }
+
+    /// <summary>
+    /// 청소하기 버튼 클릭
+    /// </summary>
+    void OnCleanButtonClicked()
     {
         VacuumCleanerInteraction vacuum = FindObjectOfType<VacuumCleanerInteraction>();
         if (vacuum != null)
         {
             vacuum.PerformCleanAction();
+            HideUI();
         }
-    }
-
-    /// <summary>
-    /// 고양이 옵션 텍스트 업데이트 (선택된 항목 강조)
-    /// </summary>
-    void UpdateCatOptionTexts()
-    {
-        if (catOptionTexts == null || catOptionTexts.Length < 3)
-            return;
-
-        string[] optionNames = { "밥주기", "놀아주기", "병원보내기" };
-
-        for (int i = 0; i < 3; i++)
+        else
         {
-            if (catOptionTexts[i] != null)
-            {
-                catOptionTexts[i].text = optionNames[i];
-                catOptionTexts[i].color = (i == (int)currentSelection) ? selectedColor : normalColor;
-            }
+            Debug.LogWarning("VacuumCleanerInteraction을 찾을 수 없습니다!");
         }
     }
 }

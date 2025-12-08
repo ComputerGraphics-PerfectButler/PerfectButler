@@ -59,20 +59,33 @@ namespace PerfectButler.GameSystem
         
         private void Start()
         {
+            // 쿨타임 Dictionary 초기화 (먼저 초기화)
+            InitializeCooltime();
+
             // 저장된 데이터가 있으면 불러오기
             if (HasSaveData())
             {
+                Debug.Log("[CatStats] 저장된 데이터 발견, 불러오기 시작");
                 LoadGameData();
+            }
+            else
+            {
+                Debug.Log("[CatStats] 저장된 데이터 없음, 새 게임 시작");
+                // 새 게임 시작 - 한 프레임 기다린 후 가구 설정
+                StartCoroutine(InitializeFurnitureAfterFrame());
             }
 
             // 스탯 자동 감소만 시작 (경험치 자동증가 제거)
             InvokeRepeating(nameof(DecreaseStats), 1f, 1f);
-            
-            // 쿨타임 Dictionary 초기화
-            InitializeCooltime();
-            
-            // 60초마다 자동 저장
-            InvokeRepeating(nameof(AutoSave), 60f, 60f);
+        }
+
+
+        /// 한 프레임 기다린 후 가구 초기화 (새 게임 시작 시)
+        private System.Collections.IEnumerator InitializeFurnitureAfterFrame()
+        {
+            yield return null; // 한 프레임 대기
+            Debug.Log("[CatStats] 한 프레임 대기 후 가구 초기화 시작");
+            UpdateFurnitureVisibility();
         }
         
         private void InitializeCooltime()
@@ -321,23 +334,27 @@ namespace PerfectButler.GameSystem
         {
             if (!HasSaveData())
             {
-                Debug.LogWarning("저장된 데이터가 없습니다!");
+                Debug.LogWarning("[CatStats] 저장된 데이터가 없습니다!");
                 return;
             }
-            
+
+            Debug.Log("[CatStats] 저장 데이터 로드 시작...");
+
             // 레벨 & 경험치 복구
             currentLevel = PlayerPrefs.GetInt("SavedLevel", 0);
             experience = PlayerPrefs.GetFloat("SavedExp", 0f);
-            
+
+            Debug.Log($"[CatStats] 레벨 복구: {currentLevel}, 경험치: {experience}");
+
             // 4가지 스탯 복구
             hunger = PlayerPrefs.GetFloat("SavedHunger", 80f);
             cleanliness = PlayerPrefs.GetFloat("SavedCleanliness", 80f);
             fun = PlayerPrefs.GetFloat("SavedFun", 80f);
             health = PlayerPrefs.GetFloat("SavedHealth", 80f);
-            
+
             string savedTime = PlayerPrefs.GetString("SavedTime", "Unknown");
-            Debug.Log($"게임 불러오기 완료! Lv.{CurrentLevelName}, Exp: {experience:F0} (저장시간: {savedTime})");
-            
+            Debug.Log($"[CatStats] 게임 불러오기 완료! Lv.{CurrentLevelName}, Exp: {experience:F0} (저장시간: {savedTime})");
+
             // UI 업데이트를 위해 이벤트 발생
             OnLevelChanged?.Invoke(currentLevel, experience, CurrentLevelName);
             OnExperienceChanged?.Invoke(experience, LevelData.EXP_PER_LEVEL);
@@ -346,6 +363,18 @@ namespace PerfectButler.GameSystem
             OnStatChanged?.Invoke(StatType.Fun, fun);
             OnStatChanged?.Invoke(StatType.Health, health);
 
+            Debug.Log("[CatStats] 이벤트 발생 완료, 가구 업데이트 예약");
+            // 한 프레임 기다린 후 가구 업데이트 (RoomDecoManager가 초기화될 시간을 줌)
+            StartCoroutine(UpdateFurnitureAfterFrame());
+        }
+
+        /// <summary>
+        /// 한 프레임 기다린 후 가구 업데이트 (데이터 로드 시)
+        /// </summary>
+        private System.Collections.IEnumerator UpdateFurnitureAfterFrame()
+        {
+            yield return null; // 한 프레임 대기
+            Debug.Log("[CatStats] 한 프레임 대기 후 가구 업데이트 시작");
             UpdateFurnitureVisibility();
         }
 
@@ -398,12 +427,19 @@ namespace PerfectButler.GameSystem
         // [추가] 가구 매니저를 찾아서 가구를 갱신하라고 명령하는 함수
         private void UpdateFurnitureVisibility()
         {
+            Debug.Log($"[CatStats] UpdateFurnitureVisibility 호출됨 - 현재 레벨: {currentLevel}");
+
             RoomDecoManager deco = FindObjectOfType<RoomDecoManager>();
 
             if (deco != null)
             {
+                Debug.Log($"[CatStats] RoomDecoManager 발견, SetFurnitureVisibility({currentLevel}) 호출");
                 deco.SetFurnitureVisibility(currentLevel);
                 Debug.Log("🏠 가구 배치 업데이트 완료!");
+            }
+            else
+            {
+                Debug.LogWarning("[CatStats] RoomDecoManager를 찾을 수 없습니다!");
             }
         }
     }

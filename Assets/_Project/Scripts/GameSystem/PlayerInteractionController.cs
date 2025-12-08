@@ -8,9 +8,6 @@ public class PlayerInteractionController : MonoBehaviour
 {
     [Header("Interaction Settings")]
     public KeyCode interactionKey = KeyCode.E;
-    public KeyCode confirmKey = KeyCode.Return; // Enter 키
-    public KeyCode upKey = KeyCode.UpArrow;
-    public KeyCode downKey = KeyCode.DownArrow;
 
     [Header("References")]
     public CatInteractionManager catInteractionManager;
@@ -53,12 +50,6 @@ public class PlayerInteractionController : MonoBehaviour
         if (Input.GetKeyDown(interactionKey))
         {
             HandleInteractionKeyPress();
-        }
-
-        // UI가 열려있을 때 방향키 및 엔터 키 처리
-        if (uiManager != null && uiManager.IsUIActive)
-        {
-            HandleUINavigation();
         }
     }
 
@@ -142,33 +133,6 @@ public class PlayerInteractionController : MonoBehaviour
             case InteractionTarget.None:
                 // 상호작용 가능한 대상 없음
                 break;
-        }
-    }
-
-    /// <summary>
-    /// UI 네비게이션 처리 (방향키 및 엔터)
-    /// </summary>
-    void HandleUINavigation()
-    {
-        if (uiManager == null)
-            return;
-
-        // 위 방향키
-        if (Input.GetKeyDown(upKey))
-        {
-            uiManager.NavigateUp();
-        }
-
-        // 아래 방향키
-        if (Input.GetKeyDown(downKey))
-        {
-            uiManager.NavigateDown();
-        }
-
-        // 엔터 키 - 선택 확정
-        if (Input.GetKeyDown(confirmKey))
-        {
-            uiManager.ConfirmSelection();
         }
     }
 

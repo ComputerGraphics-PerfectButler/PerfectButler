@@ -29,6 +29,9 @@ namespace PerfectButler.UI
         [SerializeField] private Button cleanButton;
         [SerializeField] private Button playButton;
         [SerializeField] private Button hospitalButton;
+
+        [Header("Save System")]
+        [SerializeField] private Button saveButton;
         
         // [Header("Cooltime Display")]
         // [SerializeField] private TextMeshProUGUI feedCooltime;
@@ -83,6 +86,12 @@ namespace PerfectButler.UI
 
             // 놀아주기는 먼저 쿨타임 체크 후 팝업 열기
             playButton.onClick.AddListener(OnPlayButtonClicked);
+
+            // 저장 버튼
+            if (saveButton != null)
+            {
+                saveButton.onClick.AddListener(OnSaveButtonClicked);
+            }
         }
         
         /// 놀아주기 버튼 클릭 시 - 쿨타임 체크 후 미니게임 선택 팝업 열기
@@ -96,7 +105,7 @@ namespace PerfectButler.UI
                 // TODO: 쿨타임 알림 UI 표시
                 return;
             }
-            
+
             // 쿨타임이 없다면 미니게임 선택 팝업 열기
             if (miniGamePopup != null)
             {
@@ -105,6 +114,30 @@ namespace PerfectButler.UI
             else
             {
                 Debug.LogError("MiniGameSelectionPopup이 연결되지 않았습니다!");
+            }
+        }
+
+        /// 저장 버튼 클릭 시 - 저장 후 게임 종료
+        private void OnSaveButtonClicked()
+        {
+            if (catStats != null)
+            {
+                catStats.SaveGameData();
+                Debug.Log("게임 저장 완료! 게임을 종료합니다.");
+                // TODO: 저장 완료 알림 UI 표시 (선택적)
+
+                // 게임 종료
+#if UNITY_EDITOR
+                // 에디터에서는 플레이 모드 종료
+                UnityEditor.EditorApplication.isPlaying = false;
+#else
+                // 빌드된 게임에서는 애플리케이션 종료
+                Application.Quit();
+#endif
+            }
+            else
+            {
+                Debug.LogError("CatStats를 찾을 수 없습니다!");
             }
         }
 

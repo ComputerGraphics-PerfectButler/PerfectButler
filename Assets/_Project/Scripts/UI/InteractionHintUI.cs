@@ -13,7 +13,7 @@ public class InteractionHintUI : MonoBehaviour
     public Transform uiWorldPosition; // UI가 표시될 월드 좌표
     
     [Header("UI Settings")]
-    public float uiHeightOffset = 2.0f; // 오브젝트 위 높이
+    public float uiHeightOffset = 5f; // 오브젝트 위 높이
     public Color normalColor = Color.white;
     public float fadeSpeed = 5f; // 페이드 인/아웃 속도
     

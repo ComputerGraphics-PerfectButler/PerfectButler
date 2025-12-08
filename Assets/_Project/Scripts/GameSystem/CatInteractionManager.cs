@@ -311,19 +311,25 @@ public class CatInteractionManager : MonoBehaviour
     {
         if (CatStats.Instance != null)
         {
-            bool success = CatStats.Instance.TryPerformAction(
-                StatType.Fun, 
-                15f, 
-                ActionExpReward.PLAY_MINIGAME, 
-                "놀아주기"
-            );
-
-            if (success)
+            // 쿨타임 체크만 수행 (스탯과 경험치는 미니게임 완료 후 지급)
+            if (!CatStats.Instance.CanPerformAction(StatType.Fun))
             {
-                Debug.Log("놀아주기 시작! 미니게임 진입");
-                // TODO: 미니게임 씬 로드 또는 미니게임 시작 로직
-                // 예: SceneManager.LoadScene("MiniGameScene");
-                // 또는 미니게임 매니저 호출
+                float remaining = CatStats.Instance.GetRemainingCooltime(StatType.Fun);
+                Debug.Log($"놀아주기 쿨타임 중... {remaining:F1}초 남음");
+                return;
+            }
+
+            Debug.Log("놀아주기 시작! 미니게임 선택 팝업 표시");
+
+            // 미니게임 선택 팝업 찾기 및 표시
+            PerfectButler.UI.MiniGameSelectionPopup popup = FindObjectOfType<PerfectButler.UI.MiniGameSelectionPopup>();
+            if (popup != null)
+            {
+                popup.ShowPopup();
+            }
+            else
+            {
+                Debug.LogWarning("MiniGameSelectionPopup을 찾을 수 없습니다!");
             }
         }
     }

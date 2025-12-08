@@ -32,10 +32,10 @@ namespace PerfectButler.GameSystem
     // 행동별 쿨타임 정의
     public static class ActionCooltime
     {
-        public const float FEED_CAT = 60f;       // 밥주기: 1분
+        public const float FEED_CAT = 30f;       // 밥주기: 30초
         public const float CLEAN_DUST = 0f;      // 청소: 0초
-        public const float PLAY_MINIGAME = 60f;  // 놀아주기: 1분 (미니게임이라 조금 길게)
-        public const float HOSPITAL_VISIT = 180f; // 병원: 3분 (큰 행동이니 길게)
+        public const float PLAY_MINIGAME = 30f;  // 놀아주기: 30초 
+        public const float HOSPITAL_VISIT = 60f; // 병원: 1분 
     }
     
     // 미니게임 결과별 차등 경험치

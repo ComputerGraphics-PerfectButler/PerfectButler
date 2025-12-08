@@ -44,17 +44,23 @@ namespace PerfectButler.MiniGames
         protected virtual void EndGame()
         {
             if (!isGameActive) return;
-            
+
             isGameActive = false;
-            
+
             // 결과 계산
             currentResult = CalculateResult();
-            
+
             // 결과 저장
+            Debug.Log($"[MiniGameBase] 미니게임 결과 저장 시작: {currentResult}");
             MiniGameResultManager.SaveResult(currentResult);
-            
+
+            // 미니게임 완료 플래그 설정
+            PlayerPrefs.SetInt("MiniGameCompleted", 1);
+            PlayerPrefs.Save();
+
+            Debug.Log($"[MiniGameBase] 미니게임 결과 저장 완료, 완료 플래그 설정");
             Debug.Log($"{GetGameName()} 종료! 결과: {currentResult}");
-            
+
             // 이전 씬으로 돌아가기
             ReturnToPreviousScene();
         }
