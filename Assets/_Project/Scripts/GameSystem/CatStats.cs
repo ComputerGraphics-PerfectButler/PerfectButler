@@ -216,6 +216,8 @@ namespace PerfectButler.GameSystem
 
                     // 레벨업 후 경험치 다시 전송
                     OnExperienceChanged?.Invoke(experience, LevelData.EXP_PER_LEVEL);
+
+                    UpdateFurnitureVisibility();
                 }
                 else
                 {
@@ -343,6 +345,8 @@ namespace PerfectButler.GameSystem
             OnStatChanged?.Invoke(StatType.Cleanliness, cleanliness);
             OnStatChanged?.Invoke(StatType.Fun, fun);
             OnStatChanged?.Invoke(StatType.Health, health);
+
+            UpdateFurnitureVisibility();
         }
 
         /// 저장된 게임 데이터가 있는지 확인
@@ -389,6 +393,18 @@ namespace PerfectButler.GameSystem
         public void TestLoadGame()
         {
             LoadGameData();
+        }
+
+        // [추가] 가구 매니저를 찾아서 가구를 갱신하라고 명령하는 함수
+        private void UpdateFurnitureVisibility()
+        {
+            RoomDecoManager deco = FindObjectOfType<RoomDecoManager>();
+
+            if (deco != null)
+            {
+                deco.SetFurnitureVisibility(currentLevel);
+                Debug.Log("🏠 가구 배치 업데이트 완료!");
+            }
         }
     }
 }
