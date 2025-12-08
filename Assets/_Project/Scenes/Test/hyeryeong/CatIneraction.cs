@@ -15,7 +15,12 @@ public class CatInteraction : MonoBehaviour
 
     [Header("Transition Image")]
     public GameObject transitionImagePanel; // cat_interaction.png를 표시할 패널
-    public Image transitionImage;           // cat_interaction.png 이미지
+    public CanvasGroup transitionCanvasGroup; // 페이드 효과용
+
+    [Header("Transition Settings")]
+    public float fadeInDuration = 0.5f;     // 페이드 인 시간
+    public float imageDuration = 2.5f;      // 이미지 유지 시간
+    public float fadeOutDuration = 0.5f;    // 페이드 아웃 시간
 
     [Header("Settings")]
     public float interactionDistance = 3f;
@@ -34,6 +39,9 @@ public class CatInteraction : MonoBehaviour
         if (interactionPrompt != null) interactionPrompt.SetActive(false);
         if (feedbackPanel != null) feedbackPanel.SetActive(false); // 박스 자체를 꺼버림
         if (transitionImagePanel != null) transitionImagePanel.SetActive(false); // 전환 이미지도 꺼둠
+
+        // CanvasGroup 알파값 초기화
+        if (transitionCanvasGroup != null) transitionCanvasGroup.alpha = 0f;
     }
 
     void Update()
@@ -88,6 +96,10 @@ public class CatInteraction : MonoBehaviour
             // 2. 성공했을 때
             playerInventory.ClearItem();
             ShowFeedback($"this cat loves it!");
+
+            // 고양이 색상 정보 저장
+            SaveCaughtCatData();
+
             Invoke("ShowTransitionImage", 4f); // 4초 뒤 전환 이미지 표시
         }
         else
@@ -115,14 +127,69 @@ public class CatInteraction : MonoBehaviour
         if (feedbackPanel != null) feedbackPanel.SetActive(false);
     }
 
+    // 💾 냥줍한 고양이 데이터 저장
+    void SaveCaughtCatData()
+    {
+        if (nearestCat != null)
+        {
+            // Material 이름 저장
+            if (nearestCat.catMaterial != null)
+            {
+                PlayerPrefs.SetString("CaughtCat_MaterialName", nearestCat.catMaterial.name);
+                Debug.Log($"고양이 저장: {nearestCat.catName}, Material: {nearestCat.catMaterial.name}");
+            }
+
+            // 고양이 이름 저장
+            PlayerPrefs.SetString("CaughtCat_Name", nearestCat.catName);
+
+            PlayerPrefs.Save();
+        }
+    }
+
     // 🖼️ 전환 이미지 표시
     void ShowTransitionImage()
     {
         if (transitionImagePanel != null)
         {
             transitionImagePanel.SetActive(true);
+            StartCoroutine(FadeTransition());
         }
-        Invoke("OnCatCaught", 1.5f); // 1.5초 뒤 씬 전환
+    }
+
+    // 페이드 인 -> 유지 -> 페이드 아웃 -> 씬 전환
+    System.Collections.IEnumerator FadeTransition()
+    {
+        // 1. 페이드 인
+        if (transitionCanvasGroup != null)
+        {
+            float elapsedTime = 0f;
+            while (elapsedTime < fadeInDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                transitionCanvasGroup.alpha = Mathf.Clamp01(elapsedTime / fadeInDuration);
+                yield return null;
+            }
+            transitionCanvasGroup.alpha = 1f;
+        }
+
+        // 2. 이미지 유지
+        yield return new WaitForSeconds(imageDuration);
+
+        // 3. 페이드 아웃
+        if (transitionCanvasGroup != null)
+        {
+            float elapsedTime = 0f;
+            while (elapsedTime < fadeOutDuration)
+            {
+                elapsedTime += Time.deltaTime;
+                transitionCanvasGroup.alpha = 1f - Mathf.Clamp01(elapsedTime / fadeOutDuration);
+                yield return null;
+            }
+            transitionCanvasGroup.alpha = 0f;
+        }
+
+        // 4. 씬 전환
+        OnCatCaught();
     }
 
     public void OnCatCaught()
