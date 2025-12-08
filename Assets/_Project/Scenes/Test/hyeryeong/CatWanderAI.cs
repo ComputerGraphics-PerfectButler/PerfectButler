@@ -11,7 +11,8 @@ public class CatWanderAI : MonoBehaviour
     [Header("Cat Info")]
     public CatItem preferredItem = CatItem.Toy1;
     public string catName = "고양이";
-    
+    public Material catMaterial; // 고양이 Material
+
     [Header("Follow")]
     public float followDistance = 2f;  // 이 거리보다 멀면 따라감
     public float stopDistance = 1.5f;  // ✅ 이 거리보다 가까우면 멈춤 (떨림 방지)
@@ -27,7 +28,7 @@ public class CatWanderAI : MonoBehaviour
     void Start()
     {
         startPosition = transform.position;
-        
+
         if (startPosition.y < 0.1f)
         {
             startPosition.y = 0.5f;
@@ -44,6 +45,13 @@ public class CatWanderAI : MonoBehaviour
         if (catModel != null)
         {
             initialModelRotation = catModel.localRotation;
+
+            // Material 자동 감지
+            Renderer renderer = catModel.GetComponent<Renderer>();
+            if (renderer != null && renderer.sharedMaterial != null)
+            {
+                catMaterial = renderer.sharedMaterial;
+            }
         }
 
         angle = Random.Range(0f, 360f);
