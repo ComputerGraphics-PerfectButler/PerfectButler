@@ -1,16 +1,21 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using TMPro; 
+using TMPro;
+using UnityEngine.UI;
 
 public class CatInteraction : MonoBehaviour
 {
     [Header("UI Connection")]
     public GameObject interactionPrompt; // Press E Panel (회색 박스 1)
-    
+
     // 👇 여기가 바뀜! 박스랑 글씨를 따로 연결해야 함
     public GameObject feedbackPanel;     // Feedback Panel (회색 박스 2 - 배경)
     public TMP_Text feedbackText;        // Feedback Text (글씨)
+
+    [Header("Transition Image")]
+    public GameObject transitionImagePanel; // cat_interaction.png를 표시할 패널
+    public Image transitionImage;           // cat_interaction.png 이미지
 
     [Header("Settings")]
     public float interactionDistance = 3f;
@@ -28,6 +33,7 @@ public class CatInteraction : MonoBehaviour
         // 시작할 때 박스들 싹 숨기기 (핵심!)
         if (interactionPrompt != null) interactionPrompt.SetActive(false);
         if (feedbackPanel != null) feedbackPanel.SetActive(false); // 박스 자체를 꺼버림
+        if (transitionImagePanel != null) transitionImagePanel.SetActive(false); // 전환 이미지도 꺼둠
     }
 
     void Update()
@@ -81,8 +87,8 @@ public class CatInteraction : MonoBehaviour
         {
             // 2. 성공했을 때
             playerInventory.ClearItem();
-            ShowFeedback($"this cat loves it!"); 
-            Invoke("OnCatCaught", 1.5f); 
+            ShowFeedback($"this cat loves it!");
+            Invoke("ShowTransitionImage", 4f); // 4초 뒤 전환 이미지 표시
         }
         else
         {
@@ -107,6 +113,16 @@ public class CatInteraction : MonoBehaviour
     {
         // 박스 자체를 꺼버림!
         if (feedbackPanel != null) feedbackPanel.SetActive(false);
+    }
+
+    // 🖼️ 전환 이미지 표시
+    void ShowTransitionImage()
+    {
+        if (transitionImagePanel != null)
+        {
+            transitionImagePanel.SetActive(true);
+        }
+        Invoke("OnCatCaught", 1.5f); // 1.5초 뒤 씬 전환
     }
 
     public void OnCatCaught()
