@@ -7,11 +7,14 @@ using UnityEngine.UI;
 public class CatInteraction : MonoBehaviour
 {
     [Header("UI Connection")]
-    public GameObject interactionPrompt; // Press E Panel (회색 박스 1)
+    public GameObject interactionPrompt; // Press E to Interact 이미지 오브젝트
 
-    // 👇 여기가 바뀜! 박스랑 글씨를 따로 연결해야 함
-    public GameObject feedbackPanel;     // Feedback Panel (회색 박스 2 - 배경)
-    public TMP_Text feedbackText;        // Feedback Text (글씨)
+    [Header("Feedback Images")]
+    public GameObject feedbackNeedItem;  // "You need an item!" 이미지
+    public GameObject feedbackLovesIt;   // "This cat loves it!" 이미지
+    public GameObject feedbackHatesIt;   // "Cat hates it... Try another." 이미지
+    public bool followCat = true;        // 고양이 위에 표시할지 여부
+    public Vector3 feedbackOffset = new Vector3(0, 3, 0); // 고양이 위 오프셋
 
     [Header("Transition Image")]
     public GameObject transitionImagePanel; // cat_interaction.png를 표시할 패널
@@ -35,9 +38,11 @@ public class CatInteraction : MonoBehaviour
         if (playerInventoryReference != null) playerInventory = playerInventoryReference;
         else playerInventory = FindObjectOfType<PlayerInventory>();
 
-        // 시작할 때 박스들 싹 숨기기 (핵심!)
+        // 시작할 때 UI 싹 숨기기 (핵심!)
         if (interactionPrompt != null) interactionPrompt.SetActive(false);
-        if (feedbackPanel != null) feedbackPanel.SetActive(false); // 박스 자체를 꺼버림
+        if (feedbackNeedItem != null) feedbackNeedItem.SetActive(false);
+        if (feedbackLovesIt != null) feedbackLovesIt.SetActive(false);
+        if (feedbackHatesIt != null) feedbackHatesIt.SetActive(false);
         if (transitionImagePanel != null) transitionImagePanel.SetActive(false); // 전환 이미지도 꺼둠
 
         // CanvasGroup 알파값 초기화
@@ -47,7 +52,8 @@ public class CatInteraction : MonoBehaviour
     void Update()
     {
         FindNearestCat();
-        UpdateUI(); 
+        UpdateUI();
+        UpdateFeedbackPosition(); // 피드백 위치 업데이트
 
         if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -78,6 +84,31 @@ public class CatInteraction : MonoBehaviour
         }
     }
 
+    void UpdateFeedbackPosition()
+    {
+        if (!followCat || nearestCat == null) return;
+
+        // 현재 활성화된 피드백 이미지 찾기
+        GameObject activeFeedback = null;
+        if (feedbackNeedItem != null && feedbackNeedItem.activeSelf) activeFeedback = feedbackNeedItem;
+        else if (feedbackLovesIt != null && feedbackLovesIt.activeSelf) activeFeedback = feedbackLovesIt;
+        else if (feedbackHatesIt != null && feedbackHatesIt.activeSelf) activeFeedback = feedbackHatesIt;
+
+        if (activeFeedback != null)
+        {
+            // 고양이의 월드 위치를 스크린 위치로 변환
+            Vector3 catWorldPos = nearestCat.transform.position + feedbackOffset;
+            Vector3 screenPos = Camera.main.WorldToScreenPoint(catWorldPos);
+
+            // RectTransform 위치 업데이트
+            RectTransform rectTransform = activeFeedback.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.position = screenPos;
+            }
+        }
+    }
+
     void TryInteractWithCat()
     {
         if (nearestCat == null) return;
@@ -85,7 +116,7 @@ public class CatInteraction : MonoBehaviour
         // 1. 아이템 없을 때
         if (playerInventory == null || playerInventory.currentItem == CatItem.None)
         {
-            ShowFeedback("You need an item!"); 
+            ShowFeedback(feedbackNeedItem);
             return;
         }
 
@@ -95,7 +126,7 @@ public class CatInteraction : MonoBehaviour
         {
             // 2. 성공했을 때
             playerInventory.ClearItem();
-            ShowFeedback($"this cat loves it!");
+            ShowFeedback(feedbackLovesIt);
 
             // 고양이 색상 정보 저장
             SaveCaughtCatData();
@@ -105,26 +136,31 @@ public class CatInteraction : MonoBehaviour
         else
         {
             // 3. 실패했을 때
-            ShowFeedback("Cat hates it... Try another."); 
+            ShowFeedback(feedbackHatesIt);
         }
     }
 
-    // 📢 메시지 띄우는 함수
-    void ShowFeedback(string message)
+    // 📢 피드백 이미지 띄우는 함수
+    void ShowFeedback(GameObject feedbackImage)
     {
-        // 박스 켜고, 글씨 쓰고
-        if (feedbackPanel != null) feedbackPanel.SetActive(true); 
-        if (feedbackText != null) feedbackText.text = message;
-        
+        // 먼저 모든 피드백 이미지 끄기
+        if (feedbackNeedItem != null) feedbackNeedItem.SetActive(false);
+        if (feedbackLovesIt != null) feedbackLovesIt.SetActive(false);
+        if (feedbackHatesIt != null) feedbackHatesIt.SetActive(false);
+
+        // 선택된 이미지만 켜기
+        if (feedbackImage != null) feedbackImage.SetActive(true);
+
         CancelInvoke("ClearFeedback");
         Invoke("ClearFeedback", 2f); // 2초 뒤 삭제 예약
     }
 
-    // 🧹 메시지 지우는 함수
+    // 🧹 피드백 이미지 지우는 함수
     void ClearFeedback()
     {
-        // 박스 자체를 꺼버림!
-        if (feedbackPanel != null) feedbackPanel.SetActive(false);
+        if (feedbackNeedItem != null) feedbackNeedItem.SetActive(false);
+        if (feedbackLovesIt != null) feedbackLovesIt.SetActive(false);
+        if (feedbackHatesIt != null) feedbackHatesIt.SetActive(false);
     }
 
     // 💾 냥줍한 고양이 데이터 저장
@@ -149,10 +185,16 @@ public class CatInteraction : MonoBehaviour
     // 🖼️ 전환 이미지 표시
     void ShowTransitionImage()
     {
+        Debug.Log("ShowTransitionImage 호출됨!");
         if (transitionImagePanel != null)
         {
+            Debug.Log("Panel 활성화!");
             transitionImagePanel.SetActive(true);
             StartCoroutine(FadeTransition());
+        }
+        else
+        {
+            Debug.LogError("transitionImagePanel이 연결되지 않았습니다!");
         }
     }
 
@@ -162,6 +204,7 @@ public class CatInteraction : MonoBehaviour
         // 1. 페이드 인
         if (transitionCanvasGroup != null)
         {
+            Debug.Log("페이드 인 시작! Alpha: " + transitionCanvasGroup.alpha);
             float elapsedTime = 0f;
             while (elapsedTime < fadeInDuration)
             {
@@ -170,6 +213,11 @@ public class CatInteraction : MonoBehaviour
                 yield return null;
             }
             transitionCanvasGroup.alpha = 1f;
+            Debug.Log("페이드 인 완료! Alpha: " + transitionCanvasGroup.alpha);
+        }
+        else
+        {
+            Debug.LogError("transitionCanvasGroup이 연결되지 않았습니다!");
         }
 
         // 2. 이미지 유지
