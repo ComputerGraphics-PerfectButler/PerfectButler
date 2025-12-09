@@ -3,11 +3,17 @@ using UnityEngine;
 public class InteractionEvent : MonoBehaviour
 {
     [Header("연결할 것들")]
-    public GameObject uiObject;       // 화면의 "Press E..." UI
+    public GameObject uiObject;       // 화면의 "Press E..." 이미지 (PromptPanel)
     public GameObject questionMark;   // [추가됨] 박스 위의 뱅글뱅글 물음표
 
     private bool isNear = false;
     private bool isDone = false;      // 아이템을 이미 먹었는지 체크
+
+    void Start()
+    {
+        // 시작할 때 UI 끄기
+        if (uiObject != null) uiObject.SetActive(false);
+    }
 
     void Update()
     {
