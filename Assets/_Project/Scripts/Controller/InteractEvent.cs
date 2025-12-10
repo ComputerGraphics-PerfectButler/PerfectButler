@@ -6,13 +6,22 @@ public class InteractionEvent : MonoBehaviour
     public GameObject uiObject;       // 화면의 "Press E..." 이미지 (PromptPanel)
     public GameObject questionMark;   // [추가됨] 박스 위의 뱅글뱅글 물음표
 
+    [Header("UI 위치 설정")]
+    public Vector3 uiOffset = new Vector3(0, 2f, 0); // 플레이어 머리 위 오프셋 (기본: 2유닛 위)
+
     private bool isNear = false;
     private bool isDone = false;      // 아이템을 이미 먹었는지 체크
+    private Transform playerTransform; // 플레이어 Transform 참조
+    private RectTransform uiRectTransform; // UI의 RectTransform
 
     void Start()
     {
         // 시작할 때 UI 끄기
-        if (uiObject != null) uiObject.SetActive(false);
+        if (uiObject != null)
+        {
+            uiObject.SetActive(false);
+            uiRectTransform = uiObject.GetComponent<RectTransform>();
+        }
     }
 
     void Update()
@@ -22,6 +31,29 @@ public class InteractionEvent : MonoBehaviour
         {
             DoAction();
         }
+
+        // UI가 활성화되어 있고 플레이어가 있으면 UI 위치 업데이트
+        if (uiObject != null && uiObject.activeSelf && playerTransform != null)
+        {
+            UpdateUIPosition();
+        }
+    }
+
+    /// <summary>
+    /// UI를 플레이어 머리 위로 따라다니게 함
+    /// </summary>
+    void UpdateUIPosition()
+    {
+        if (uiRectTransform == null || playerTransform == null) return;
+
+        // 플레이어 머리 위의 월드 좌표
+        Vector3 worldPosition = playerTransform.position + uiOffset;
+
+        // 월드 좌표를 스크린 좌표로 변환
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(worldPosition);
+
+        // UI 위치 설정
+        uiRectTransform.position = screenPosition;
     }
 
     void DoAction()
@@ -51,6 +83,7 @@ public class InteractionEvent : MonoBehaviour
         if (other.CompareTag("Player") && !isDone)
         {
             isNear = true;
+            playerTransform = other.transform; // 플레이어 Transform 저장
             uiObject.SetActive(true);
         }
     }
@@ -61,6 +94,7 @@ public class InteractionEvent : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isNear = false;
+            playerTransform = null; // 플레이어 참조 해제
             uiObject.SetActive(false);
         }
     }

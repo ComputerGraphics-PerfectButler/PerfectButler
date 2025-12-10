@@ -18,6 +18,23 @@ public class ParkPlayerMovement : MonoBehaviour
     private float yVelocity = 0f;
     private float footstepTimer = 0f;
 
+    // 플레이어 이동 가능 여부 (대사 진행 중에는 false)
+    private bool canMove = true;
+
+    /// <summary>
+    /// 플레이어 이동 가능 여부 설정
+    /// </summary>
+    public void SetCanMove(bool value)
+    {
+        canMove = value;
+
+        // 이동 불가능할 때는 애니메이션도 정지
+        if (!canMove && animator != null)
+        {
+            animator.SetBool("isWalk", false);
+        }
+    }
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -26,6 +43,20 @@ public class ParkPlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // 이동 불가능 상태면 중력만 적용하고 리턴
+        if (!canMove)
+        {
+            // 중력만 적용
+            if (controller.isGrounded)
+                yVelocity = 0f;
+            else
+                yVelocity += gravity * Time.deltaTime;
+
+            Vector3 gravityMove = new Vector3(0, yVelocity, 0);
+            controller.Move(gravityMove * Time.deltaTime);
+            return;
+        }
+
         var keyboard = Keyboard.current;
 
         // float h = 0f;

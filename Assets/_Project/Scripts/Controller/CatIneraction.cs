@@ -8,6 +8,7 @@ public class CatInteraction : MonoBehaviour
 {
     [Header("UI Connection")]
     public GameObject interactionPrompt; // Press E to Interact 이미지 오브젝트
+    public Vector3 promptOffset = new Vector3(0, 2f, 0); // 플레이어 머리 위 오프셋
 
     [Header("Feedback Images")]
     public GameObject feedbackNeedItem;  // "You need an item!" 이미지
@@ -53,7 +54,8 @@ public class CatInteraction : MonoBehaviour
     {
         FindNearestCat();
         UpdateUI();
-        UpdateFeedbackPosition(); // 피드백 위치 업데이트
+        UpdatePromptPosition(); // 프롬프트 위치 업데이트 (플레이어 머리 위)
+        UpdateFeedbackPosition(); // 피드백 위치 업데이트 (고양이 머리 위)
 
         if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
         {
@@ -81,6 +83,25 @@ public class CatInteraction : MonoBehaviour
         {
             bool canInteract = (nearestCat != null);
             interactionPrompt.SetActive(canInteract);
+        }
+    }
+
+    /// <summary>
+    /// Press E Prompt를 플레이어 머리 위에 표시
+    /// </summary>
+    void UpdatePromptPosition()
+    {
+        if (interactionPrompt == null || !interactionPrompt.activeSelf) return;
+
+        // 플레이어(이 스크립트가 붙어있는 오브젝트)의 위치를 기준으로
+        Vector3 playerWorldPos = transform.position + promptOffset;
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(playerWorldPos);
+
+        // RectTransform 위치 업데이트
+        RectTransform rectTransform = interactionPrompt.GetComponent<RectTransform>();
+        if (rectTransform != null)
+        {
+            rectTransform.position = screenPos;
         }
     }
 
