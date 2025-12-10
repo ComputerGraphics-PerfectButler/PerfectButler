@@ -23,12 +23,6 @@ namespace PerfectButler.UI
         [SerializeField] private TextMeshProUGUI levelText; // "Lv.1 초보 집사"
         [SerializeField] private TextMeshProUGUI expText; // 경험치 숫자 표시 (예: "45/100")
         
-        // [Header("Quest System")]
-        // [SerializeField] private Toggle feedCatQuest; // 고양이 밥 주기 5회
-        // [SerializeField] private Toggle playCatQuest; // 고양이 놀아주기 10회
-        // [SerializeField] private Toggle cleanHouseQuest; // 집 깨끗하게 정리하기
-        // [SerializeField] private Toggle levelUpQuest; // 레벨업하기
-        
         [Header("Action Buttons")]
         [SerializeField] private Button feedButton;
         [SerializeField] private Button cleanButton;
@@ -37,18 +31,6 @@ namespace PerfectButler.UI
 
         [Header("Save System")]
         [SerializeField] private Button saveButton;
-        
-        // [Header("Cooltime Display")]
-        // [SerializeField] private TextMeshProUGUI feedCooltime;
-        // [SerializeField] private TextMeshProUGUI cleanCooltime;
-        // [SerializeField] private TextMeshProUGUI playCooltime;
-        // [SerializeField] private TextMeshProUGUI hospitalCooltime;
-        
-        // 퀘스트 진행상황 추적
-        // private int feedCount = 0;
-        // private int playCount = 0;
-        // private bool isHouseCleaned = false;
-        // private int initialLevel = 0;
 
         [Header("Mini Game Popup")]
         [SerializeField] private MiniGameSelectionPopup miniGamePopup;
@@ -158,39 +140,6 @@ namespace PerfectButler.UI
             }
         }
 
-        // private void TryAction(StatType statType, float statIncrease, float expReward, string actionName)
-        // {
-        //     if (catStats.TryPerformAction(statType, statIncrease, expReward, actionName))
-        //     {
-        //         // 퀘스트 진행상황 업데이트
-        //         UpdateQuestProgress(statType);
-        //     }
-        // }
-        
-        // private void UpdateQuestProgress(StatType statType)
-        // {
-        //     switch (statType)
-        //     {
-        //         case StatType.Hunger:
-        //             feedCount++;
-        //             feedCatQuest.isOn = feedCount >= 5;
-        //             break;
-                    
-        //         case StatType.Fun:
-        //             playCount++;
-        //             playCatQuest.isOn = playCount >= 10;
-        //             break;
-                    
-        //         case StatType.Cleanliness:
-        //             // 청결도가 90 이상이면 집이 깨끗하다고 판단
-        //             if (catStats.Cleanliness >= 90f)
-        //             {
-        //                 isHouseCleaned = true;
-        //                 cleanHouseQuest.isOn = true;
-        //             }
-        //             break;
-        //     }
-        // }
         
         private void UpdateStatBar(StatType statType, float value)
         {
@@ -222,12 +171,6 @@ namespace PerfectButler.UI
             float expPercentage = exp / LevelData.EXP_PER_LEVEL;
             expCircle.fillAmount = expPercentage;
             expText.text = $"{(int)exp}";
-
-            // 레벨업 퀘스트 체크 (후순위)
-            // if (catStats.CurrentLevel > initialLevel)
-            // {
-            //     levelUpQuest.isOn = true;
-            // }
         }
 
         // 경험치 UI만 업데이트 (경험치 변경 시마다 호출)
@@ -250,29 +193,6 @@ namespace PerfectButler.UI
                 Debug.LogWarning("expText가 할당되지 않았습니다.");
         }
         
-        // 쿨타임 업데이트 (후순위)
-        // private void UpdateCooltime()
-        // {
-        //     UpdateCooltimeText(StatType.Hunger, feedCooltime);
-        //     UpdateCooltimeText(StatType.Cleanliness, cleanCooltime);
-        //     UpdateCooltimeText(StatType.Fun, playCooltime);
-        //     UpdateCooltimeText(StatType.Health, hospitalCooltime);
-        // }
-
-        // private void UpdateCooltimeText(StatType statType, TextMeshProUGUI cooltimeText)
-        // {
-        //     if (catStats.CanPerformAction(statType))
-        //     {
-        //         cooltimeText.text = "사용가능";
-        //         cooltimeText.color = Color.green;
-        //     }
-        //     else
-        //     {
-        //         float remaining = catStats.GetRemainingCooltime(statType);
-        //         cooltimeText.text = $"{remaining:F0}초";
-        //         cooltimeText.color = Color.red;
-        //     }
-        // }
         
         private void UpdateAllUI()
         {
