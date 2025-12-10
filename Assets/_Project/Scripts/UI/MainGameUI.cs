@@ -7,12 +7,17 @@ namespace PerfectButler.UI
 {
     public class MainGameUI : MonoBehaviour
     {
+        public static MainGameUI Instance { get; private set; }
+
+        [Header("UI Panel")]
+        [SerializeField] private GameObject uiPanel; // 전체 UI 패널 (게임 오버 시 숨길 패널)
+
         [Header("Stat Bars")]
         [SerializeField] private Slider hungerBar;
         [SerializeField] private Slider cleanlinessBar;
         [SerializeField] private Slider funBar;
         [SerializeField] private Slider healthBar;
-        
+
         [Header("Level System")]
         [SerializeField] private Image expCircle; // 원형 경험치 바
         [SerializeField] private TextMeshProUGUI levelText; // "Lv.1 초보 집사"
@@ -49,6 +54,18 @@ namespace PerfectButler.UI
         [SerializeField] private MiniGameSelectionPopup miniGamePopup;
 
         private CatStats catStats;
+
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
 
         private void Start()
         {
@@ -275,6 +292,28 @@ namespace PerfectButler.UI
             CatStats.OnStatChanged -= UpdateStatBar;
             CatStats.OnLevelChanged -= UpdateLevelUI;
             CatStats.OnExperienceChanged -= UpdateExperienceUI;
+        }
+
+        /// <summary>
+        /// UI 패널 숨기기 (게임 오버/클리어 시 호출)
+        /// </summary>
+        public void HideUI()
+        {
+            if (uiPanel != null)
+            {
+                uiPanel.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// UI 패널 표시
+        /// </summary>
+        public void ShowUI()
+        {
+            if (uiPanel != null)
+            {
+                uiPanel.SetActive(true);
+            }
         }
     }
 }

@@ -56,13 +56,4 @@ public class GameLevelManager : MonoBehaviour
             decoManager.SetFurnitureVisibility(currentLevel);
         }
     }
-    
-    // 테스트용: 키보드 'Space' 누르면 밥주기 경험치 획득
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            AddExp(ActionExpReward.FEED_CAT); // 회원님이 정의한 밥주기 경험치(5f) 사용
-        }
-    }
 }

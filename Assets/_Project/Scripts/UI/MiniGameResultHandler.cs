@@ -7,6 +7,9 @@ namespace PerfectButler.UI
     /// MainGameUI나 GameManager와 같은 오브젝트에 추가
     public class MiniGameResultHandler : MonoBehaviour
     {
+        [Header("SFX")]
+        [SerializeField] private AudioClip miniGameReturnSound; // 미니게임 완료 후 돌아왔을 때 소리
+
         private bool hasProcessedResult = false;
 
         private void Start()
@@ -94,6 +97,12 @@ namespace PerfectButler.UI
             };
 
             Debug.Log($"[MiniGameResultHandler] 보상 지급 시작: 결과={result}, 재미+{funIncrease}, 경험치+{expReward}");
+
+            // 미니게임 완료 후 돌아왔을 때 소리 재생
+            if (SFXManager.Instance != null && miniGameReturnSound != null)
+            {
+                SFXManager.Instance.PlaySound(miniGameReturnSound);
+            }
 
             // 스탯 및 경험치 적용 + 쿨타임 기록
             CatStats.Instance.PerformActionWithoutCooldownCheck(

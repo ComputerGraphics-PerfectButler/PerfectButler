@@ -8,6 +8,11 @@ public class PlayerMovement : MonoBehaviour
     public float rotationSpeed = 10f;
     public float fixedY = 0.3394098f; // Y값 고정
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip footstepSound; // 발자국 소리
+    [SerializeField] private float footstepInterval = 0.5f; // 발자국 소리 재생 간격 (초)
+    private float footstepTimer = 0f;
+
     private CharacterController controller;
     private Animator animator;
 
@@ -51,10 +56,19 @@ public class PlayerMovement : MonoBehaviour
 
             controller.Move(moveDir * moveSpeed * Time.deltaTime);
             animator?.SetBool("isWalking", true);
+
+            // 발자국 소리 재생 (일정 간격마다)
+            footstepTimer += Time.deltaTime;
+            if (footstepTimer >= footstepInterval)
+            {
+                PlayFootstepSound();
+                footstepTimer = 0f;
+            }
         }
         else
         {
             animator?.SetBool("isWalking", false);
+            footstepTimer = 0f; // 멈추면 타이머 리셋
         }
 
         // Y 고정: 현재 Y와 목표 Y의 차이만큼 보정
@@ -62,6 +76,17 @@ public class PlayerMovement : MonoBehaviour
         if (Mathf.Abs(yDifference) > 0.0001f)
         {
             controller.Move(new Vector3(0, yDifference, 0));
+        }
+    }
+
+    /// <summary>
+    /// 발자국 소리 재생
+    /// </summary>
+    private void PlayFootstepSound()
+    {
+        if (SFXManager.Instance != null && footstepSound != null)
+        {
+            SFXManager.Instance.PlaySound(footstepSound);
         }
     }
 }
