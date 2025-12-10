@@ -22,6 +22,9 @@ public class CatInteractionManager : MonoBehaviour
     public float interactionRange = 2f; // 상호작용 가능 범위
     public Transform playerTransform; // 플레이어 Transform
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip catEatingSound; // 고양이 밥먹는 소리
+
     // 패턴 리스트
     private List<MovementPattern> allPatterns;
     private List<MovementPattern> availablePatterns; // 현재 사용 가능한 패턴들
@@ -292,6 +295,12 @@ public class CatInteractionManager : MonoBehaviour
 
             if (success)
             {
+                // 고양이 밥먹는 소리 재생
+                if (SFXManager.Instance != null && catEatingSound != null)
+                {
+                    SFXManager.Instance.PlaySound(catEatingSound);
+                }
+
                 // 현재 진행 중인 패턴 중지
                 StopCurrentPattern();
 

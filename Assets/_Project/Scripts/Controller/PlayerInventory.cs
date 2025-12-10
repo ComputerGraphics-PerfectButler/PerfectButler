@@ -14,6 +14,9 @@ public class PlayerInventory : MonoBehaviour
 {
     public CatItem currentItem = CatItem.None;
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip itemPickupSound; // 아이템 획득 소리
+
     void Start()
     {
         Debug.Log($"[PlayerInventory] 초기화됨. 시작 아이템: {currentItem}");
@@ -23,6 +26,12 @@ public class PlayerInventory : MonoBehaviour
     {
         currentItem = (CatItem)itemIndex;
         Debug.Log($"★★★ [인벤토리]: {currentItem} 획득! (인덱스: {itemIndex}) 이제 고양이에게 사용할 수 있습니다. ★★★");
+
+        // 아이템 획득 소리 재생
+        if (SFXManager.Instance != null && itemPickupSound != null)
+        {
+            SFXManager.Instance.PlaySound(itemPickupSound);
+        }
     }
 
     public void ClearItem()

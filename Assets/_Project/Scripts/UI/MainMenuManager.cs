@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using TMPro;
 
 namespace PerfectButler.UI
 {
@@ -22,8 +21,10 @@ namespace PerfectButler.UI
         [Header("Settings UI")]
         [SerializeField] private Slider bgmVolumeSlider;
         [SerializeField] private Slider sfxVolumeSlider;
-        [SerializeField] private Toggle fullscreenToggle;
-        
+
+        [Header("SFX")]
+        [SerializeField] private AudioClip buttonClickSound;   // 버튼 클릭 소리
+
         [Header("Scene Names")]
         [SerializeField] private string parkSceneName = "park"; // 동네 탐험 Scene
         [SerializeField] private string roomSceneName = "room";   // 집 Scene
@@ -44,16 +45,28 @@ namespace PerfectButler.UI
         {
             // 메인 메뉴 버튼
             if (startButton != null)
+            {
+                startButton.onClick.AddListener(PlayButtonSound);
                 startButton.onClick.AddListener(OnStartGame);
+            }
             if (settingsButton != null)
+            {
+                settingsButton.onClick.AddListener(PlayButtonSound);
                 settingsButton.onClick.AddListener(OnShowSettings);
+            }
             if (quitButton != null)
+            {
+                quitButton.onClick.AddListener(PlayButtonSound);
                 quitButton.onClick.AddListener(OnQuitGame);
-            
+            }
+
             // 설정 화면 버튼
             if (backButton != null)
+            {
+                backButton.onClick.AddListener(PlayButtonSound);
                 backButton.onClick.AddListener(OnBackToMainMenu);
-                
+            }
+
             // 설정 슬라이더/토글 이벤트
             if (bgmVolumeSlider != null)
             {
@@ -63,9 +76,14 @@ namespace PerfectButler.UI
             {
                 sfxVolumeSlider.onValueChanged.AddListener(OnSFXVolumeChanged);
             }
-            if (fullscreenToggle != null)
+        }
+
+        // ===== 버튼 클릭 효과음 =====
+        private void PlayButtonSound()
+        {
+            if (SFXManager.Instance != null && buttonClickSound != null)
             {
-                fullscreenToggle.onValueChanged.AddListener(OnFullscreenToggled);
+                SFXManager.Instance.PlaySound(buttonClickSound);
             }
         }
         
@@ -195,12 +213,6 @@ namespace PerfectButler.UI
             {
                 sfxVolumeSlider.value = sfxVolume;
             }
-                
-            // 전체화면 (기본값 true)
-            bool isFullscreen = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
-            if (fullscreenToggle != null)
-                fullscreenToggle.isOn = isFullscreen;
-            Screen.fullScreen = isFullscreen;
         }
         
         private void OnBGMVolumeChanged(float value)
@@ -221,17 +233,14 @@ namespace PerfectButler.UI
         {
             PlayerPrefs.SetFloat("SFXVolume", value);
             PlayerPrefs.Save();
-            
+
+            // SFXManager에 볼륨 적용
+            if (SFXManager.Instance != null)
+            {
+                SFXManager.Instance.SetVolume(value);
+            }
+
             Debug.Log($"SFX 볼륨: {value * 100:F0}%");
-        }
-        
-        private void OnFullscreenToggled(bool isFullscreen)
-        {
-            PlayerPrefs.SetInt("Fullscreen", isFullscreen ? 1 : 0);
-            PlayerPrefs.Save();
-            Screen.fullScreen = isFullscreen;
-            
-            Debug.Log($"전체화면: {(isFullscreen ? "ON" : "OFF")}");
         }
         
         // ===== 디버그/테스트용 =====

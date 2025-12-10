@@ -8,10 +8,15 @@ public class ParkPlayerMovement : MonoBehaviour
     public float rotationSpeed = 10f;
     public float gravity = -9.81f;
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip footstepSound;    // 발자국 소리
+    [SerializeField] private float footstepInterval = 1.5f; // 발자국 소리 간격
+
     private CharacterController controller;
     private Animator animator;
 
     private float yVelocity = 0f;
+    private float footstepTimer = 0f;
 
     void Start()
     {
@@ -48,6 +53,21 @@ public class ParkPlayerMovement : MonoBehaviour
         // 애니메이터에게 알려줌 (Animator 창의 파라미터 이름이 "isWalk"라고 가정)
         animator.SetBool("isWalk", isMoving);
 
+        // 발자국 소리 재생
+        if (isMoving)
+        {
+            footstepTimer += Time.deltaTime;
+            if (footstepTimer >= footstepInterval)
+            {
+                PlayFootstepSound();
+                footstepTimer = 0f;
+            }
+        }
+        else
+        {
+            footstepTimer = 0f;
+        }
+
         // *** 카메라 기준 이동 방향 계산 ***
         Vector3 camForward = Camera.main.transform.forward;
         Vector3 camRight = Camera.main.transform.right;
@@ -77,5 +97,23 @@ public class ParkPlayerMovement : MonoBehaviour
         Vector3 move = moveDir * moveSpeed + new Vector3(0, yVelocity, 0);
 
         controller.Move(move * Time.deltaTime);
+    }
+
+    void PlayFootstepSound()
+    {
+        if (SFXManager.Instance == null)
+        {
+            Debug.LogWarning("SFXManager.Instance가 null입니다!");
+            return;
+        }
+
+        if (footstepSound == null)
+        {
+            Debug.LogWarning("footstepSound가 할당되지 않았습니다!");
+            return;
+        }
+
+        SFXManager.Instance.PlaySound(footstepSound, 0.6f);
+        Debug.Log("발자국 소리 재생!");
     }
 }

@@ -13,6 +13,10 @@ public class CatWanderAI : MonoBehaviour
     public string catName = "고양이";
     public Material catMaterial; // 고양이 Material
 
+    [Header("SFX")]
+    [SerializeField] private AudioClip catLikeSound;    // 좋아할 때 소리
+    [SerializeField] private AudioClip catDislikeSound; // 싫어할 때 소리
+
     [Header("Follow")]
     public float followDistance = 2f;  // 이 거리보다 멀면 따라감
     public float stopDistance = 1.5f;  // ✅ 이 거리보다 가까우면 멈춤 (떨림 방지)
@@ -199,6 +203,13 @@ public class CatWanderAI : MonoBehaviour
         if (item == preferredItem)
         {
             Debug.Log($"[{catName}] {item}을(를) 좋아해요! 따라갑니다.");
+
+            // 좋아하는 소리 재생
+            if (SFXManager.Instance != null && catLikeSound != null)
+            {
+                SFXManager.Instance.PlaySound(catLikeSound);
+            }
+
             isFollowing = true;
             owner = player;
             return true;
@@ -206,6 +217,13 @@ public class CatWanderAI : MonoBehaviour
         else
         {
             Debug.Log($"[{catName}] {item}은(는) 싫어요... (좋아하는 건: {preferredItem})");
+
+            // 싫어하는 소리 재생
+            if (SFXManager.Instance != null && catDislikeSound != null)
+            {
+                SFXManager.Instance.PlaySound(catDislikeSound);
+            }
+
             return false;
         }
     }

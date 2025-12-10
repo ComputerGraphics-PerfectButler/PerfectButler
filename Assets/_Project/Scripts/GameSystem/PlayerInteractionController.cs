@@ -135,19 +135,4 @@ public class PlayerInteractionController : MonoBehaviour
                 break;
         }
     }
-
-    /// <summary>
-    /// 디버그용: 상호작용 가능 상태 표시
-    /// </summary>
-    void OnGUI()
-    {
-        if (currentTarget != InteractionTarget.None)
-        {
-            string message = currentTarget == InteractionTarget.Cat 
-                ? "E - 고양이와 상호작용" 
-                : "E - 청소하기";
-            
-            GUI.Label(new Rect(Screen.width / 2 - 100, Screen.height - 100, 200, 30), message);
-        }
-    }
 }

@@ -24,6 +24,9 @@ namespace PerfectButler.GameSystem
         [Header("Cooltime System")]
         [SerializeField] private bool showCooltime = true; // Inspector에서 쿨타임 표시 여부
 
+        [Header("SFX")]
+        [SerializeField] private AudioClip levelUpSound; // 레벨업 소리
+
         // 쿨타임 추적용 Dictionary
         private Dictionary<StatType, float> lastActionTime = new Dictionary<StatType, float>();
 
@@ -223,6 +226,12 @@ namespace PerfectButler.GameSystem
                 {
                     currentLevel++;
                     experience = 0f;
+
+                    // 레벨업 소리 재생
+                    if (SFXManager.Instance != null && levelUpSound != null)
+                    {
+                        SFXManager.Instance.PlaySound(levelUpSound);
+                    }
 
                     Debug.Log($"레벨업! 현재 레벨: {CurrentLevelName}");
                     OnLevelChanged?.Invoke(currentLevel, experience, CurrentLevelName);

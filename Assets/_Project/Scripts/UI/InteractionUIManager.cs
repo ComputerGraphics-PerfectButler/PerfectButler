@@ -3,9 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using PerfectButler.GameSystem;
 
-/// <summary>
 /// 플레이어 머리 위에 표시되는 상호작용 UI를 관리하는 클래스
-/// </summary>
 public class InteractionUIManager : MonoBehaviour
 {
     [Header("UI References")]
@@ -22,6 +20,9 @@ public class InteractionUIManager : MonoBehaviour
     [Header("Vacuum Cleaner UI")]
     public GameObject vacuumCleanerPanel;
     public Button cleanButton;     // 청소하기 버튼
+
+    [Header("SFX")]
+    [SerializeField] private AudioClip buttonClickSound; // 버튼 클릭 소리
 
     private bool isUIActive = false;
     private Transform playerTransform;
@@ -44,24 +45,43 @@ public class InteractionUIManager : MonoBehaviour
         SetupButtonListeners();
     }
 
-    /// <summary>
     /// 버튼 이벤트 리스너 설정
-    /// </summary>
     void SetupButtonListeners()
     {
         // 고양이 상호작용 버튼
         if (feedButton != null)
+        {
+            feedButton.onClick.AddListener(PlayButtonSound);
             feedButton.onClick.AddListener(OnFeedButtonClicked);
+        }
 
         if (playButton != null)
+        {
+            playButton.onClick.AddListener(PlayButtonSound);
             playButton.onClick.AddListener(OnPlayButtonClicked);
+        }
 
         if (hospitalButton != null)
+        {
+            hospitalButton.onClick.AddListener(PlayButtonSound);
             hospitalButton.onClick.AddListener(OnHospitalButtonClicked);
+        }
 
         // 청소기 버튼
         if (cleanButton != null)
+        {
+            cleanButton.onClick.AddListener(PlayButtonSound);
             cleanButton.onClick.AddListener(OnCleanButtonClicked);
+        }
+    }
+
+    /// 버튼 클릭 소리 재생
+    void PlayButtonSound()
+    {
+        if (SFXManager.Instance != null && buttonClickSound != null)
+        {
+            SFXManager.Instance.PlaySound(buttonClickSound);
+        }
     }
 
     void OnDestroy()
@@ -97,9 +117,7 @@ public class InteractionUIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// 고양이 상호작용 UI 표시
-    /// </summary>
     public void ShowCatInteractionUI(Transform player)
     {
         playerTransform = player;
@@ -115,9 +133,7 @@ public class InteractionUIManager : MonoBehaviour
             vacuumCleanerPanel.SetActive(false);
     }
 
-    /// <summary>
     /// 청소기 상호작용 UI 표시
-    /// </summary>
     public void ShowVacuumCleanerUI(Transform player)
     {
         playerTransform = player;
@@ -133,9 +149,7 @@ public class InteractionUIManager : MonoBehaviour
             vacuumCleanerPanel.SetActive(true);
     }
 
-    /// <summary>
     /// UI 숨기기
-    /// </summary>
     public void HideUI()
     {
         isUIActive = false;
@@ -161,9 +175,7 @@ public class InteractionUIManager : MonoBehaviour
 
     // ========== 버튼 클릭 이벤트 핸들러 ==========
 
-    /// <summary>
     /// 밥주기 버튼 클릭
-    /// </summary>
     void OnFeedButtonClicked()
     {
         CatInteractionManager catManager = CatInteractionManager.Instance;
@@ -178,9 +190,7 @@ public class InteractionUIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// 놀아주기 버튼 클릭
-    /// </summary>
     void OnPlayButtonClicked()
     {
         CatInteractionManager catManager = CatInteractionManager.Instance;
@@ -195,9 +205,7 @@ public class InteractionUIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// 병원보내기 버튼 클릭
-    /// </summary>
     void OnHospitalButtonClicked()
     {
         CatInteractionManager catManager = CatInteractionManager.Instance;
@@ -212,9 +220,7 @@ public class InteractionUIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// 청소하기 버튼 클릭
-    /// </summary>
     void OnCleanButtonClicked()
     {
         VacuumCleanerInteraction vacuum = FindObjectOfType<VacuumCleanerInteraction>();
