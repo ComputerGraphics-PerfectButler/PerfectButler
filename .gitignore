@@ -116,3 +116,10 @@ InitTestScene*.unity*
 /[Aa]ssets/Cats.meta
 /[Aa]ssets/_Recovery/
 /[Aa]ssets/cats_characters/
+
+# Plastic SCM 관련 무시
+.plastic/
+fs_beacon
+
+# 윈도우 시스템 에러 파일 무시
+NUL
