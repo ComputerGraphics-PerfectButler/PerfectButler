@@ -1,5 +1,8 @@
 # 🐈‍⬛ Perfect Butler
 
+<img width="1920" height="1080" alt="perfectbutler" src="https://github.com/user-attachments/assets/1b4f249c-487b-4804-adb1-2f912aad74f8" />
+
+
 ## 디렉토리 구조 설명
 
 ```
